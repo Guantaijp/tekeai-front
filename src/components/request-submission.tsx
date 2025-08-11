@@ -572,11 +572,11 @@ export function RequestSubmission() {
                                             Ksh {formatCurrency(shipmentData.priceQuote?.customerPrice)}
                                         </span>
                                     </div>
-                                    <div className="text-sm space-y-1 text-green-600">
-                                        <p>Transporter Payout: Ksh {formatCurrency(shipmentData.priceQuote?.transporterPayout)}</p>
-                                        <p>Platform Fee: Ksh {formatCurrency(shipmentData.priceQuote?.platformFee)}</p>
-                                        <p className="mt-2">By approving, transporters will see this shipment with this price.</p>
-                                    </div>
+                                    {/*<div className="text-sm space-y-1 text-green-600">*/}
+                                    {/*    <p>Transporter Payout: Ksh {formatCurrency(shipmentData.priceQuote?.transporterPayout)}</p>*/}
+                                    {/*    <p>Platform Fee: Ksh {formatCurrency(shipmentData.priceQuote?.platformFee)}</p>*/}
+                                    {/*    <p className="mt-2">By approving, transporters will see this shipment with this price.</p>*/}
+                                    {/*</div>*/}
                                 </div>
 
                                 {/* Route Information */}
@@ -623,38 +623,38 @@ export function RequestSubmission() {
                                     </div>
                                 </div>
 
-                                <Separator />
+                                {/*<Separator />*/}
 
                                 {/* Price Breakdown */}
                                 {shipmentData.priceQuote?.breakdown && (
                                     <div>
-                                        <h3 className="font-semibold text-lg mb-3">Price Breakdown</h3>
+                                        {/*<h3 className="font-semibold text-lg mb-3">Price Breakdown</h3>*/}
                                         <div className="space-y-2 text-sm">
-                                            <div className="flex justify-between">
-                                                <span>Base Rate Cost:</span>
-                                                <span>Ksh {formatCurrency(shipmentData.priceQuote.breakdown.baseRateCost)}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span>Fuel Cost:</span>
-                                                <span>Ksh {formatCurrency(shipmentData.priceQuote.breakdown.fuelCost)}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span>Total Transport Cost:</span>
-                                                <span>Ksh {formatCurrency(shipmentData.priceQuote.breakdown.totalTransportCost)}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span>Platform Margin:</span>
-                                                <span>Ksh {formatCurrency(shipmentData.priceQuote.breakdown.margin)}</span>
-                                            </div>
-                                            <Separator />
-                                            <div className="flex justify-between">
-                                                <span>Transporter Payout:</span>
-                                                <span className="font-semibold text-blue-600">Ksh {formatCurrency(shipmentData.priceQuote.transporterPayout)}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span>Platform Fee:</span>
-                                                <span className="font-semibold text-gray-600">Ksh {formatCurrency(shipmentData.priceQuote.platformFee)}</span>
-                                            </div>
+                                            {/*<div className="flex justify-between">*/}
+                                            {/*    <span>Base Rate Cost:</span>*/}
+                                            {/*    <span>Ksh {formatCurrency(shipmentData.priceQuote.breakdown.baseRateCost)}</span>*/}
+                                            {/*</div>*/}
+                                            {/*<div className="flex justify-between">*/}
+                                            {/*    <span>Fuel Cost:</span>*/}
+                                            {/*    <span>Ksh {formatCurrency(shipmentData.priceQuote.breakdown.fuelCost)}</span>*/}
+                                            {/*</div>*/}
+                                            {/*<div className="flex justify-between">*/}
+                                            {/*    <span>Total Transport Cost:</span>*/}
+                                            {/*    <span>Ksh {formatCurrency(shipmentData.priceQuote.breakdown.totalTransportCost)}</span>*/}
+                                            {/*</div>*/}
+                                            {/*<div className="flex justify-between">*/}
+                                            {/*    <span>Platform Margin:</span>*/}
+                                            {/*    <span>Ksh {formatCurrency(shipmentData.priceQuote.breakdown.margin)}</span>*/}
+                                            {/*</div>*/}
+                                            {/*<Separator />*/}
+                                            {/*<div className="flex justify-between">*/}
+                                            {/*    <span>Transporter Payout:</span>*/}
+                                            {/*    <span className="font-semibold text-blue-600">Ksh {formatCurrency(shipmentData.priceQuote.transporterPayout)}</span>*/}
+                                            {/*</div>*/}
+                                            {/*<div className="flex justify-between">*/}
+                                            {/*    <span>Platform Fee:</span>*/}
+                                            {/*    <span className="font-semibold text-gray-600">Ksh {formatCurrency(shipmentData.priceQuote.platformFee)}</span>*/}
+                                            {/*</div>*/}
                                             <Separator />
                                             <div className="flex justify-between font-bold text-lg">
                                                 <span>Customer Total Price:</span>

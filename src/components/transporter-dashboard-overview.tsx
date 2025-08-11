@@ -211,12 +211,12 @@ export function TransporterDashboardOverview() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            ${dashboardData.totalPayout.toLocaleString('en-US', {
+                            KSh {dashboardData.totalPayout.toLocaleString('en-KE', {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2
                         })}
                         </div>
-                        <p className="text-xs text-muted-foreground">After 5% platform fee</p>
+                        {/*<p className="text-xs text-muted-foreground">After 5% platform fee</p>*/}
                     </CardContent>
                 </Card>
 
@@ -284,7 +284,7 @@ export function TransporterDashboardOverview() {
                                         <YAxis
                                             dataKey="earnings"
                                             yAxisId="left"
-                                            tickFormatter={(value) => `$${Number(value) >= 1000 ? (Number(value)/1000).toFixed(1) + 'k' : value}`}
+                                            tickFormatter={(value) => `KSh ${Number(value) >= 1000 ? (Number(value)/1000).toFixed(1) + 'k' : value}`}
                                             name="Earnings"
                                         />
                                         <YAxis
@@ -299,11 +299,9 @@ export function TransporterDashboardOverview() {
                                             content={<ChartTooltipContent
                                                 formatter={(value, name) => {
                                                     if (name === "earnings") {
-                                                        return Intl.NumberFormat('en-US', {
-                                                            style: 'currency',
-                                                            currency: 'USD',
+                                                        return `KSh ${Number(value).toLocaleString('en-KE', {
                                                             maximumFractionDigits: 0
-                                                        }).format(value as number)
+                                                        })}`
                                                     }
                                                     return value
                                                 }}
@@ -362,7 +360,7 @@ export function TransporterDashboardOverview() {
                                                 <Badge variant={getStatusVariant(job.status)}>{job.status}</Badge>
                                             </TableCell>
                                             <TableCell className="text-right font-medium">
-                                                ${job.payout.toLocaleString()}
+                                                KSh {job.payout.toLocaleString('en-KE')}
                                             </TableCell>
                                         </TableRow>
                                     ))}

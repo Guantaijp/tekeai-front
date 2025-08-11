@@ -174,16 +174,16 @@ export const transporterService = {
 
 export const fleetService = {
     getAllVehicles: async () => {
-        return api.get<ApiResponse<Vehicle[]>>("/fleet")
+        return api.get<ApiResponse<Vehicle[]>>("vehicles/my-vehicles")
     },
     addVehicle: async (data: CreateFleetDto) => {
-        return api.post<ApiResponse<Vehicle>>("/fleet", data)
+        return api.post<ApiResponse<Vehicle>>("vehicles", data)
     },
     updateVehicle: async (id: string, data: UpdateFleetDto) => {
-        return api.patch<ApiResponse<Vehicle>>(`/fleet/${id}`, data)
+        return api.patch<ApiResponse<Vehicle>>(`/vehicles/${id}`, data)
     },
     deleteVehicle: async (id: string) => {
-        return api.del<ApiResponse<null>>(`/fleet/${id}`)
+        return api.del<ApiResponse<null>>(`/vehicles/${id}`)
     },
 }
 

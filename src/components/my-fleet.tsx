@@ -89,9 +89,13 @@ export function MyFleet() {
         try {
             setIsLoading(true)
             const response = await fleetService.getAllVehicles()
-            setVehicles(response.data.data)
+            // Add safety checks for the response structure
+            const vehiclesData = response?.data?.data || response?.data || []
+            setVehicles(Array.isArray(vehiclesData) ? vehiclesData : [])
         } catch (error) {
             console.error("Error fetching vehicles:", error)
+            // Set to empty array on error to prevent undefined issues
+            setVehicles([])
             toast({
                 title: "Error",
                 description: "Failed to fetch vehicles. Please try again.",
@@ -192,9 +196,23 @@ export function MyFleet() {
     }
 
     const resetForm = () => {
-        form.reset()
+        form.reset({
+            registrationNumber: "",
+            make: "",
+            model: "",
+            year: new Date().getFullYear(),
+            type: "",
+            tonnage: 0,
+            fuelConsumptionPerKm: 0,
+            baseRatePerKm: 0,
+            insuranceNumber: "",
+            insuranceExpiryDate: "",
+        })
         setEditingVehicle(null)
     }
+
+    // Add safety check for vehicles array
+    const safeVehicles = Array.isArray(vehicles) ? vehicles : []
 
     return (
         <Card>
@@ -350,7 +368,7 @@ export function MyFleet() {
                                         name="baseRatePerKm"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Base Rate ($/km)</FormLabel>
+                                                <FormLabel>Base Rate (Ksh/km)</FormLabel>
                                                 <FormControl>
                                                     <Input
                                                         type="number"
@@ -548,7 +566,7 @@ export function MyFleet() {
                                         name="baseRatePerKm"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Base Rate ($/km)</FormLabel>
+                                                <FormLabel>Base Rate (Ksh/km)</FormLabel>
                                                 <FormControl>
                                                     <Input
                                                         type="number"
@@ -625,14 +643,14 @@ export function MyFleet() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {vehicles.length === 0 ? (
+                            {safeVehicles.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                                         No vehicles found. Add your first vehicle to get started.
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                vehicles.map((vehicle) => (
+                                safeVehicles.map((vehicle) => (
                                     <TableRow key={vehicle.id}>
                                         <TableCell className="font-mono">{vehicle.registrationNumber}</TableCell>
                                         <TableCell className="font-medium">
@@ -640,7 +658,7 @@ export function MyFleet() {
                                         </TableCell>
                                         <TableCell className="capitalize">{vehicle.type}</TableCell>
                                         <TableCell>{vehicle.tonnage}t</TableCell>
-                                        <TableCell>${vehicle.baseRatePerKm}</TableCell>
+                                        <TableCell>Ksh{vehicle.baseRatePerKm}</TableCell>
                                         <TableCell>{new Date(vehicle.insuranceExpiryDate).toLocaleDateString()}</TableCell>
                                         <TableCell className="text-center">
                                             <Badge variant={getStatusVariant(vehicle.status)}>{vehicle.status || "Available"}</Badge>

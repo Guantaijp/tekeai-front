@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect, useCallback } from "react"
-import { Plus, Save, Fuel } from "lucide-react"
+import { Plus, Save, Fuel, Edit2, Trash2, X, Check } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,18 +17,33 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { pricingService, getGlobalFuelPrice, updateGlobalFuelPrice } from "@/index"
-import type { PricingRule, CreatePricingRuleDto, UpdatePricingRuleDto } from "@/types/api"
+import type { PricingRule, CreatePricingRuleDto, UpdatePricingRuleDto, DeletePriceRuleDto } from "@/types/api"
 
 export default function PricingModelPage() {
     const [pricingRules, setPricingRules] = useState<PricingRule[]>([])
-    console.log("Pricing rules",pricingRules)
+    console.log("Pricing rules", pricingRules)
     const [globalFuelPrice, setGlobalFuelPrice] = useState<number>(0)
     const [initialGlobalFuelPrice, setInitialGlobalFuelPrice] = useState<number>(0)
     const [modifiedRules, setModifiedRules] = useState<Set<string>>(new Set())
     const [isSaving, setIsSaving] = useState<boolean>(false)
     const [isAddRuleDialogOpen, setIsAddRuleDialogOpen] = useState<boolean>(false)
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false)
+    const [editingRule, setEditingRule] = useState<PricingRule | null>(null)
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false)
+    const [ruleToDelete, setRuleToDelete] = useState<PricingRule | null>(null)
+    const [isDeleting, setIsDeleting] = useState<boolean>(false)
     const [newRuleData, setNewRuleData] = useState<CreatePricingRuleDto>({
         name: "",
         minWeight: 0,
@@ -159,7 +174,7 @@ export default function PricingModelPage() {
         const { id, value } = e.target
         setNewRuleData((prev) => ({
             ...prev,
-            [id]: ["minWeight", "maxWeight", "fuelConsumptionPerKm", "baseRatePerKm"].includes(id)
+            [id]: ["minWeight", "maxWeight", "fuelConsumptionPerKm", "baseRatePerKm", "fuelPricePerLitre", "platformMargin", "transporterPayoutPercentage"].includes(id)
                 ? Number.parseFloat(value) || 0
                 : value,
         }))
@@ -171,7 +186,9 @@ export default function PricingModelPage() {
                 ...newRuleData,
                 fuelPricePerLitre: globalFuelPrice, // Ensure new rule uses current global fuel price
             })
-            if (response.success) {
+
+            // Check if response has data property (indicating success)
+            if (response.data) {
                 const normalizedNewRule = normalizeRule(response.data)
                 setPricingRules((prev) => [...prev, normalizedNewRule])
                 setIsAddRuleDialogOpen(false)
@@ -186,10 +203,10 @@ export default function PricingModelPage() {
                     transporterPayoutPercentage: 0.7,
                     isActive: true,
                 })
-                alert("New rule added successfully!")
+                alert(response.message || "New rule added successfully!")
             } else {
                 console.error("Failed to create rule:", response.message)
-                alert("Failed to add new rule.")
+                alert(response.message || "Failed to add new rule.")
             }
         } catch (error) {
             console.error("Error creating rule:", error)
@@ -197,11 +214,93 @@ export default function PricingModelPage() {
         }
     }
 
+    const handleEditRule = (rule: PricingRule) => {
+        setEditingRule(rule)
+        setIsEditDialogOpen(true)
+    }
+
+    const handleEditRuleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { id, value } = e.target
+        if (editingRule) {
+            setEditingRule((prev) => ({
+                ...prev!,
+                [id]: ["minWeight", "maxWeight", "fuelConsumptionPerKm", "baseRatePerKm", "fuelPricePerLitre", "platformMargin", "transporterPayoutPercentage"].includes(id)
+                    ? Number.parseFloat(value) || 0
+                    : value,
+            }))
+        }
+    }
+
+    const handleUpdateRule = async () => {
+        if (!editingRule) return
+
+        try {
+            const updatePayload: UpdatePricingRuleDto = {
+                name: editingRule.name,
+                minWeight: editingRule.minWeight,
+                maxWeight: editingRule.maxWeight,
+                fuelConsumptionPerKm: editingRule.fuelConsumptionPerKm,
+                baseRatePerKm: editingRule.baseRatePerKm,
+                fuelPricePerLitre: editingRule.fuelPricePerLitre,
+                platformMargin: editingRule.platformMargin,
+                transporterPayoutPercentage: editingRule.transporterPayoutPercentage,
+                isActive: editingRule.isActive,
+            }
+
+            const response = await pricingService.updatePricingRule(editingRule.id, updatePayload)
+
+            if (response.data) {
+                const normalizedUpdatedRule = normalizeRule(response.data)
+                setPricingRules((prev) =>
+                    prev.map((rule) =>
+                        rule.id === editingRule.id ? normalizedUpdatedRule : rule
+                    )
+                )
+                setIsEditDialogOpen(false)
+                setEditingRule(null)
+                alert("Rule updated successfully!")
+            } else {
+                console.error("Failed to update rule:", response.message)
+                alert(response.message || "Failed to update rule.")
+            }
+        } catch (error) {
+            console.error("Error updating rule:", error)
+            alert("Error updating rule.")
+        }
+    }
+
+    const handleDeleteRule = (rule: PricingRule) => {
+        setRuleToDelete(rule)
+        setDeleteDialogOpen(true)
+    }
+
+    const confirmDeleteRule = async () => {
+        if (!ruleToDelete) return
+
+        setIsDeleting(true)
+        try {
+            const deletePayload: DeletePriceRuleDto = {
+                isActive: false, // Assuming soft delete by setting isActive to false
+            }
+
+            await pricingService.deletePriceRule(ruleToDelete.id, deletePayload)
+
+            setPricingRules((prev) => prev.filter((rule) => rule.id !== ruleToDelete.id))
+            setDeleteDialogOpen(false)
+            setRuleToDelete(null)
+            alert("Rule deleted successfully!")
+        } catch (error) {
+            console.error("Error deleting rule:", error)
+            alert("Error deleting rule.")
+        } finally {
+            setIsDeleting(false)
+        }
+    }
+
     const hasChanges = modifiedRules.size > 0 || globalFuelPrice !== initialGlobalFuelPrice
 
     return (
         <div className="flex h-screen bg-gray-50 dark:bg-gray-950">
-
             <main className="flex-1 flex flex-col p-6 overflow-auto">
                 <div className="flex items-center justify-between mb-6">
                     <div className="grid gap-1">
@@ -211,20 +310,6 @@ export default function PricingModelPage() {
                         </p>
                     </div>
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            <Label htmlFor="fuel-price" className="sr-only">
-                                Fuel Price (KES/Litre)
-                            </Label>
-                            <span className="text-gray-500 dark:text-gray-400">KES</span>
-                            <Input
-                                id="fuel-price"
-                                type="number"
-                                value={globalFuelPrice}
-                                onChange={handleGlobalFuelPriceChange}
-                                className="w-24 text-right"
-                                step="0.01"
-                            />
-                        </div>
                         <Dialog open={isAddRuleDialogOpen} onOpenChange={setIsAddRuleDialogOpen}>
                             <DialogTrigger asChild>
                                 <Button>
@@ -308,6 +393,112 @@ export default function PricingModelPage() {
                         </Dialog>
                     </div>
                 </div>
+
+                {/* Edit Rule Dialog */}
+                <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle>Edit Pricing Rule</DialogTitle>
+                            <DialogDescription>Update the details for this pricing rule.</DialogDescription>
+                        </DialogHeader>
+                        {editingRule && (
+                            <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="name" className="text-right">
+                                        Tonnage Name
+                                    </Label>
+                                    <Input
+                                        id="name"
+                                        value={editingRule.name}
+                                        onChange={handleEditRuleChange}
+                                        className="col-span-3"
+                                        placeholder="e.g., 1T, 5T"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="minWeight" className="text-right">
+                                        Min Weight (Tons)
+                                    </Label>
+                                    <Input
+                                        id="minWeight"
+                                        type="number"
+                                        value={editingRule.minWeight}
+                                        onChange={handleEditRuleChange}
+                                        className="col-span-3"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="maxWeight" className="text-right">
+                                        Max Weight (Tons)
+                                    </Label>
+                                    <Input
+                                        id="maxWeight"
+                                        type="number"
+                                        value={editingRule.maxWeight}
+                                        onChange={handleEditRuleChange}
+                                        className="col-span-3"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="fuelConsumptionPerKm" className="text-right">
+                                        Fuel Consumption (L/km)
+                                    </Label>
+                                    <Input
+                                        id="fuelConsumptionPerKm"
+                                        type="number"
+                                        value={editingRule.fuelConsumptionPerKm}
+                                        onChange={handleEditRuleChange}
+                                        className="col-span-3"
+                                        step="0.01"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="baseRatePerKm" className="text-right">
+                                        Base Rate (KES/km)
+                                    </Label>
+                                    <Input
+                                        id="baseRatePerKm"
+                                        type="number"
+                                        value={editingRule.baseRatePerKm}
+                                        onChange={handleEditRuleChange}
+                                        className="col-span-3"
+                                        step="0.01"
+                                    />
+                                </div>
+                            </div>
+                        )}
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button onClick={handleUpdateRule}>Update Rule</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Delete Confirmation Dialog */}
+                <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Pricing Rule</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Are you sure you want to delete the rule "{ruleToDelete?.name}"?
+                                This action cannot be undone.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                                onClick={confirmDeleteRule}
+                                disabled={isDeleting}
+                                className="bg-red-600 hover:bg-red-700"
+                            >
+                                {isDeleting ? "Deleting..." : "Delete"}
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+
                 <div className="border rounded-lg overflow-hidden bg-white dark:bg-gray-900">
                     <Table>
                         <TableHeader>
@@ -316,12 +507,13 @@ export default function PricingModelPage() {
                                 <TableHead>Weight Range</TableHead>
                                 <TableHead>Fuel Consumption (L/km)</TableHead>
                                 <TableHead>Base Rate (KES/km)</TableHead>
+                                <TableHead className="w-[100px]">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {pricingRules.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="text-center text-gray-500 py-8">
+                                    <TableCell colSpan={5} className="text-center text-gray-500 py-8">
                                         No valid pricing rules found. Add a new rule to get started.
                                     </TableCell>
                                 </TableRow>
@@ -354,6 +546,26 @@ export default function PricingModelPage() {
                                                     className="w-24 text-right"
                                                     step="0.01"
                                                 />
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleEditRule(rule)}
+                                                    className="h-8 w-8 p-0"
+                                                >
+                                                    <Edit2 className="w-4 h-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleDeleteRule(rule)}
+                                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
                                             </div>
                                         </TableCell>
                                     </TableRow>

@@ -1,8 +1,8 @@
 import axios, { type AxiosInstance, type AxiosResponse, type AxiosError } from "axios"
 
 // Use the BACKEND_URL environment variable, defaulting to localhost:3001
-// const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000/"
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://teke-back-1-ten.vercel.app/"
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000/"
+// const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://teke-back-1-ten.vercel.app/"
 
 const apiClient: AxiosInstance = axios.create({
     baseURL: BACKEND_URL,

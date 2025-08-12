@@ -203,6 +203,9 @@ export const adminService = {
     getAnalyticsData: async () => {
         return api.get<ApiResponse<AdminAnalyticsData>>("/admin/analytics")
     },
+    getAllShipments:async () => {
+        return api.get<ApiResponse<Shipment[]>>("/admin/shipments")
+    }
 }
 
 

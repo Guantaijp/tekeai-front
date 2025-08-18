@@ -72,13 +72,13 @@ export function UserManagement() {
     }
 
     const handleSuspendUser = async (userId: string, currentStatus: UserStatus) => {
-        if (!confirm(`Are you sure you want to ${currentStatus === "active" ? "suspend" : "activate"} this user?`)) return
-        const newStatus: UserStatus = currentStatus === "active" ? "inactive" : "active" // Toggle status
+        if (!confirm(`Are you sure you want to ${currentStatus === "active" ? "suspended" : "activate"} this user?`)) return
+        const newStatus: UserStatus = currentStatus === "active" ? "suspended" : "active" // Toggle status
         try {
             await userService.updateUserStatus(userId, { status: newStatus })
             fetchUsers() // Re-fetch users to update the table
         } catch (err: any) {
-            alert(err.response?.data?.message || `Failed to ${newStatus === "inactive" ? "suspend" : "activate"} user.`)
+            alert(err.response?.data?.message || `Failed to ${newStatus === "inactive" ? "suspended" : "activate"} user.`)
             console.error("Error updating user status:", err)
         }
     }
@@ -170,12 +170,12 @@ export function UserManagement() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem onClick={() => console.log(`View profile for ${user.name}`)}>
-                                                    View Profile
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => console.log(`Edit user ${user.name}`)}>
-                                                    Edit User
-                                                </DropdownMenuItem>
+                                                {/*<DropdownMenuItem onClick={() => console.log(`View profile for ${user.name}`)}>*/}
+                                                {/*    View Profile*/}
+                                                {/*</DropdownMenuItem>*/}
+                                                {/*<DropdownMenuItem onClick={() => console.log(`Edit user ${user.name}`)}>*/}
+                                                {/*    Edit User*/}
+                                                {/*</DropdownMenuItem>*/}
                                                 <DropdownMenuItem
                                                     className="text-destructive"
                                                     onClick={() => handleSuspendUser(user.id, user.status)}

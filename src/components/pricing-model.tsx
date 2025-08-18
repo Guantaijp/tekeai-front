@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect, useCallback } from "react"
-import { Plus, Save, Fuel, Edit2, Trash2, X, Check } from "lucide-react"
+import { Plus, Save, Fuel, Edit2, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -59,15 +59,17 @@ export default function PricingModelPage() {
     // Helper function to convert string values to numbers and handle nulls
     const normalizeRule = (rule: any): PricingRule => ({
         ...rule,
-        minWeight: rule.minWeight ? parseFloat(rule.minWeight) : 0,
-        maxWeight: rule.maxWeight ? parseFloat(rule.maxWeight) : 0,
-        fuelConsumptionPerKm: rule.fuelConsumptionPerKm ? parseFloat(rule.fuelConsumptionPerKm) : 0,
-        baseRatePerKm: rule.baseRatePerKm ? parseFloat(rule.baseRatePerKm) : 0,
-        fuelPricePerLitre: rule.fuelPricePerLitre ? parseFloat(rule.fuelPricePerLitre) : 0,
-        platformMargin: rule.platformMargin ? parseFloat(rule.platformMargin) : 0.5,
-        transporterPayoutPercentage: rule.transporterPayoutPercentage ? parseFloat(rule.transporterPayoutPercentage) : 0.7,
-        name: rule.name || 'Unnamed Rule',
-        isActive: rule.isActive !== undefined ? rule.isActive : true
+        minWeight: rule.minWeight ? Number.parseFloat(rule.minWeight) : 0,
+        maxWeight: rule.maxWeight ? Number.parseFloat(rule.maxWeight) : 0,
+        fuelConsumptionPerKm: rule.fuelConsumptionPerKm ? Number.parseFloat(rule.fuelConsumptionPerKm) : 0,
+        baseRatePerKm: rule.baseRatePerKm ? Number.parseFloat(rule.baseRatePerKm) : 0,
+        fuelPricePerLitre: rule.fuelPricePerLitre ? Number.parseFloat(rule.fuelPricePerLitre) : 0,
+        platformMargin: rule.platformMargin ? Number.parseFloat(rule.platformMargin) : 0.5,
+        transporterPayoutPercentage: rule.transporterPayoutPercentage
+            ? Number.parseFloat(rule.transporterPayoutPercentage)
+            : 0.7,
+        name: rule.name || "Unnamed Rule",
+        isActive: rule.isActive !== undefined ? rule.isActive : true,
     })
 
     const fetchPricingRules = useCallback(async () => {
@@ -83,11 +85,13 @@ export default function PricingModelPage() {
             const validRules = rulesData
                 .filter((rule: any) => {
                     // Only filter out rules where ALL essential fields are null
-                    return rule.name !== null &&
+                    return (
+                        rule.name !== null &&
                         rule.fuelConsumptionPerKm !== null &&
                         rule.baseRatePerKm !== null &&
                         rule.minWeight !== null &&
                         rule.maxWeight !== null
+                    )
                 })
                 .map(normalizeRule)
 
@@ -174,7 +178,15 @@ export default function PricingModelPage() {
         const { id, value } = e.target
         setNewRuleData((prev) => ({
             ...prev,
-            [id]: ["minWeight", "maxWeight", "fuelConsumptionPerKm", "baseRatePerKm", "fuelPricePerLitre", "platformMargin", "transporterPayoutPercentage"].includes(id)
+            [id]: [
+                "minWeight",
+                "maxWeight",
+                "fuelConsumptionPerKm",
+                "baseRatePerKm",
+                "fuelPricePerLitre",
+                "platformMargin",
+                "transporterPayoutPercentage",
+            ].includes(id)
                 ? Number.parseFloat(value) || 0
                 : value,
         }))
@@ -224,7 +236,15 @@ export default function PricingModelPage() {
         if (editingRule) {
             setEditingRule((prev) => ({
                 ...prev!,
-                [id]: ["minWeight", "maxWeight", "fuelConsumptionPerKm", "baseRatePerKm", "fuelPricePerLitre", "platformMargin", "transporterPayoutPercentage"].includes(id)
+                [id]: [
+                    "minWeight",
+                    "maxWeight",
+                    "fuelConsumptionPerKm",
+                    "baseRatePerKm",
+                    "fuelPricePerLitre",
+                    "platformMargin",
+                    "transporterPayoutPercentage",
+                ].includes(id)
                     ? Number.parseFloat(value) || 0
                     : value,
             }))
@@ -251,11 +271,7 @@ export default function PricingModelPage() {
 
             if (response.data) {
                 const normalizedUpdatedRule = normalizeRule(response.data)
-                setPricingRules((prev) =>
-                    prev.map((rule) =>
-                        rule.id === editingRule.id ? normalizedUpdatedRule : rule
-                    )
-                )
+                setPricingRules((prev) => prev.map((rule) => (rule.id === editingRule.id ? normalizedUpdatedRule : rule)))
                 setIsEditDialogOpen(false)
                 setEditingRule(null)
                 alert("Rule updated successfully!")
@@ -301,42 +317,43 @@ export default function PricingModelPage() {
 
     return (
         <div className="flex h-screen bg-gray-50 dark:bg-gray-950">
-            <main className="flex-1 flex flex-col p-6 overflow-auto">
-                <div className="flex items-center justify-between mb-6">
+            <main className="flex-1 flex flex-col p-3 sm:p-6 overflow-auto">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                     <div className="grid gap-1">
-                        <h1 className="text-2xl font-bold">AI Pricing Model</h1>
-                        <p className="text-gray-500 dark:text-gray-400">
+                        <h1 className="text-xl sm:text-2xl font-bold">AI Pricing Model</h1>
+                        <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
                             Adjust the parameters used by the AI to calculate shipment prices.
                         </p>
                     </div>
                     <div className="flex items-center gap-4">
                         <Dialog open={isAddRuleDialogOpen} onOpenChange={setIsAddRuleDialogOpen}>
                             <DialogTrigger asChild>
-                                <Button>
+                                <Button size="sm" className="sm:size-default">
                                     <Plus className="w-4 h-4 mr-2" />
-                                    Add Rule
+                                    <span className="hidden xs:inline">Add Rule</span>
+                                    <span className="xs:hidden">Add</span>
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px]">
+                            <DialogContent className="w-[95vw] max-w-[425px] sm:w-full">
                                 <DialogHeader>
                                     <DialogTitle>Add New Pricing Rule</DialogTitle>
                                     <DialogDescription>Enter the details for the new pricing rule.</DialogDescription>
                                 </DialogHeader>
                                 <div className="grid gap-4 py-4">
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                        <Label htmlFor="name" className="text-right">
+                                    <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                                        <Label htmlFor="name" className="sm:text-right">
                                             Tonnage Name
                                         </Label>
                                         <Input
                                             id="name"
                                             value={newRuleData.name}
                                             onChange={handleNewRuleChange}
-                                            className="col-span-3"
+                                            className="sm:col-span-3"
                                             placeholder="e.g., 1T, 5T"
                                         />
                                     </div>
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                        <Label htmlFor="minWeight" className="text-right">
+                                    <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                                        <Label htmlFor="minWeight" className="sm:text-right">
                                             Min Weight (Tons)
                                         </Label>
                                         <Input
@@ -344,11 +361,11 @@ export default function PricingModelPage() {
                                             type="number"
                                             value={newRuleData.minWeight}
                                             onChange={handleNewRuleChange}
-                                            className="col-span-3"
+                                            className="sm:col-span-3"
                                         />
                                     </div>
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                        <Label htmlFor="maxWeight" className="text-right">
+                                    <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                                        <Label htmlFor="maxWeight" className="sm:text-right">
                                             Max Weight (Tons)
                                         </Label>
                                         <Input
@@ -356,11 +373,11 @@ export default function PricingModelPage() {
                                             type="number"
                                             value={newRuleData.maxWeight}
                                             onChange={handleNewRuleChange}
-                                            className="col-span-3"
+                                            className="sm:col-span-3"
                                         />
                                     </div>
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                        <Label htmlFor="fuelConsumptionPerKm" className="text-right">
+                                    <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                                        <Label htmlFor="fuelConsumptionPerKm" className="sm:text-right">
                                             Fuel Consumption (L/km)
                                         </Label>
                                         <Input
@@ -368,12 +385,12 @@ export default function PricingModelPage() {
                                             type="number"
                                             value={newRuleData.fuelConsumptionPerKm}
                                             onChange={handleNewRuleChange}
-                                            className="col-span-3"
+                                            className="sm:col-span-3"
                                             step="0.01"
                                         />
                                     </div>
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                        <Label htmlFor="baseRatePerKm" className="text-right">
+                                    <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                                        <Label htmlFor="baseRatePerKm" className="sm:text-right">
                                             Base Rate (KES/km)
                                         </Label>
                                         <Input
@@ -381,7 +398,7 @@ export default function PricingModelPage() {
                                             type="number"
                                             value={newRuleData.baseRatePerKm}
                                             onChange={handleNewRuleChange}
-                                            className="col-span-3"
+                                            className="sm:col-span-3"
                                             step="0.01"
                                         />
                                     </div>
@@ -396,27 +413,27 @@ export default function PricingModelPage() {
 
                 {/* Edit Rule Dialog */}
                 <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                    <DialogContent className="sm:max-w-[425px]">
+                    <DialogContent className="w-[95vw] max-w-[425px] sm:w-full">
                         <DialogHeader>
                             <DialogTitle>Edit Pricing Rule</DialogTitle>
                             <DialogDescription>Update the details for this pricing rule.</DialogDescription>
                         </DialogHeader>
                         {editingRule && (
                             <div className="grid gap-4 py-4">
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="name" className="text-right">
+                                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                                    <Label htmlFor="name" className="sm:text-right">
                                         Tonnage Name
                                     </Label>
                                     <Input
                                         id="name"
                                         value={editingRule.name}
                                         onChange={handleEditRuleChange}
-                                        className="col-span-3"
+                                        className="sm:col-span-3"
                                         placeholder="e.g., 1T, 5T"
                                     />
                                 </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="minWeight" className="text-right">
+                                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                                    <Label htmlFor="minWeight" className="sm:text-right">
                                         Min Weight (Tons)
                                     </Label>
                                     <Input
@@ -424,11 +441,11 @@ export default function PricingModelPage() {
                                         type="number"
                                         value={editingRule.minWeight}
                                         onChange={handleEditRuleChange}
-                                        className="col-span-3"
+                                        className="sm:col-span-3"
                                     />
                                 </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="maxWeight" className="text-right">
+                                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                                    <Label htmlFor="maxWeight" className="sm:text-right">
                                         Max Weight (Tons)
                                     </Label>
                                     <Input
@@ -436,11 +453,11 @@ export default function PricingModelPage() {
                                         type="number"
                                         value={editingRule.maxWeight}
                                         onChange={handleEditRuleChange}
-                                        className="col-span-3"
+                                        className="sm:col-span-3"
                                     />
                                 </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="fuelConsumptionPerKm" className="text-right">
+                                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                                    <Label htmlFor="fuelConsumptionPerKm" className="sm:text-right">
                                         Fuel Consumption (L/km)
                                     </Label>
                                     <Input
@@ -448,12 +465,12 @@ export default function PricingModelPage() {
                                         type="number"
                                         value={editingRule.fuelConsumptionPerKm}
                                         onChange={handleEditRuleChange}
-                                        className="col-span-3"
+                                        className="sm:col-span-3"
                                         step="0.01"
                                     />
                                 </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="baseRatePerKm" className="text-right">
+                                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                                    <Label htmlFor="baseRatePerKm" className="sm:text-right">
                                         Base Rate (KES/km)
                                     </Label>
                                     <Input
@@ -461,7 +478,7 @@ export default function PricingModelPage() {
                                         type="number"
                                         value={editingRule.baseRatePerKm}
                                         onChange={handleEditRuleChange}
-                                        className="col-span-3"
+                                        className="sm:col-span-3"
                                         step="0.01"
                                     />
                                 </div>
@@ -482,8 +499,7 @@ export default function PricingModelPage() {
                         <AlertDialogHeader>
                             <AlertDialogTitle>Delete Pricing Rule</AlertDialogTitle>
                             <AlertDialogDescription>
-                                Are you sure you want to delete the rule "{ruleToDelete?.name}"?
-                                This action cannot be undone.
+                                Are you sure you want to delete the rule "{ruleToDelete?.name}"? This action cannot be undone.
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
@@ -499,63 +515,103 @@ export default function PricingModelPage() {
                     </AlertDialogContent>
                 </AlertDialog>
 
-                <div className="border rounded-lg overflow-hidden bg-white dark:bg-gray-900">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-[150px]">Tonnage (Tons)</TableHead>
-                                <TableHead>Weight Range</TableHead>
-                                <TableHead>Fuel Consumption (L/km)</TableHead>
-                                <TableHead>Base Rate (KES/km)</TableHead>
-                                <TableHead className="w-[100px]">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {pricingRules.length === 0 ? (
+                <div className="border rounded-lg bg-white dark:bg-gray-900">
+                    {/* Desktop Table View - hidden on mobile */}
+                    <div className="hidden md:block">
+                        <Table>
+                            <TableHeader>
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center text-gray-500 py-8">
-                                        No valid pricing rules found. Add a new rule to get started.
-                                    </TableCell>
+                                    <TableHead className="w-[150px]">Tonnage (Tons)</TableHead>
+                                    <TableHead>Weight Range</TableHead>
+                                    <TableHead>Fuel Consumption (L/km)</TableHead>
+                                    <TableHead>Base Rate (KES/km)</TableHead>
+                                    <TableHead className="w-[100px]">Actions</TableHead>
                                 </TableRow>
-                            ) : (
-                                pricingRules.map((rule) => (
-                                    <TableRow key={rule.id}>
-                                        <TableCell className="font-medium">{rule.name}</TableCell>
-                                        <TableCell className="text-sm text-gray-500">
-                                            {rule.minWeight}T - {rule.maxWeight}T
+                            </TableHeader>
+                            <TableBody>
+                                {pricingRules.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="text-center text-gray-500 py-8">
+                                            No valid pricing rules found. Add a new rule to get started.
                                         </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2">
-                                                <Fuel className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                                <Input
-                                                    type="number"
-                                                    value={rule.fuelConsumptionPerKm}
-                                                    onChange={(e) => handleRuleChange(rule.id, "fuelConsumptionPerKm", e.target.value)}
-                                                    className="w-24 text-right"
-                                                    step="0.01"
-                                                />
+                                    </TableRow>
+                                ) : (
+                                    pricingRules.map((rule) => (
+                                        <TableRow key={rule.id}>
+                                            <TableCell className="font-medium">{rule.name}</TableCell>
+                                            <TableCell className="text-sm text-gray-500">
+                                                {rule.minWeight}T - {rule.maxWeight}T
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2">
+                                                    <Fuel className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                                    <Input
+                                                        type="number"
+                                                        value={rule.fuelConsumptionPerKm}
+                                                        onChange={(e) => handleRuleChange(rule.id, "fuelConsumptionPerKm", e.target.value)}
+                                                        className="w-24 text-right"
+                                                        step="0.01"
+                                                    />
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-gray-500 dark:text-gray-400">KES</span>
+                                                    <Input
+                                                        type="number"
+                                                        value={rule.baseRatePerKm}
+                                                        onChange={(e) => handleRuleChange(rule.id, "baseRatePerKm", e.target.value)}
+                                                        className="w-24 text-right"
+                                                        step="0.01"
+                                                    />
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleEditRule(rule)}
+                                                        className="h-8 w-8 p-0"
+                                                    >
+                                                        <Edit2 className="w-4 h-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleDeleteRule(rule)}
+                                                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+
+                    {/* Mobile Card View - visible only on mobile and tablet */}
+                    <div className="md:hidden">
+                        {pricingRules.length === 0 ? (
+                            <div className="text-center text-gray-500 py-8 px-4">
+                                No valid pricing rules found. Add a new rule to get started.
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                                {pricingRules.map((rule) => (
+                                    <div key={rule.id} className="p-4 space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h3 className="font-medium text-lg">{rule.name}</h3>
+                                                <p className="text-sm text-gray-500">
+                                                    {rule.minWeight}T - {rule.maxWeight}T
+                                                </p>
                                             </div>
-                                        </TableCell>
-                                        <TableCell>
                                             <div className="flex items-center gap-2">
-                                                <span className="text-gray-500 dark:text-gray-400">KES</span>
-                                                <Input
-                                                    type="number"
-                                                    value={rule.baseRatePerKm}
-                                                    onChange={(e) => handleRuleChange(rule.id, "baseRatePerKm", e.target.value)}
-                                                    className="w-24 text-right"
-                                                    step="0.01"
-                                                />
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => handleEditRule(rule)}
-                                                    className="h-8 w-8 p-0"
-                                                >
+                                                <Button variant="ghost" size="sm" onClick={() => handleEditRule(rule)} className="h-8 w-8 p-0">
                                                     <Edit2 className="w-4 h-4" />
                                                 </Button>
                                                 <Button
@@ -567,19 +623,55 @@ export default function PricingModelPage() {
                                                     <Trash2 className="w-4 h-4" />
                                                 </Button>
                                             </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div>
+                                                <Label className="text-xs text-gray-500 uppercase tracking-wide">Fuel Consumption (L/km)</Label>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <Fuel className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                                    <Input
+                                                        type="number"
+                                                        value={rule.fuelConsumptionPerKm}
+                                                        onChange={(e) => handleRuleChange(rule.id, "fuelConsumptionPerKm", e.target.value)}
+                                                        className="flex-1 text-right"
+                                                        step="0.01"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <Label className="text-xs text-gray-500 uppercase tracking-wide">Base Rate (KES/km)</Label>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span className="text-gray-500 dark:text-gray-400 text-sm">KES</span>
+                                                    <Input
+                                                        type="number"
+                                                        value={rule.baseRatePerKm}
+                                                        onChange={(e) => handleRuleChange(rule.id, "baseRatePerKm", e.target.value)}
+                                                        className="flex-1 text-right"
+                                                        step="0.01"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
-                <div className="mt-6 flex justify-end">
-                    <Button onClick={handleSaveAllChanges} disabled={!hasChanges || isSaving}>
-                        {isSaving ? "Saving..." : "Save All Changes"}
-                        <Save className="w-4 h-4 ml-2" />
-                    </Button>
-                </div>
+
+                {/*<div className="mt-4 sm:mt-6 flex justify-end">*/}
+                {/*    <Button*/}
+                {/*        onClick={handleSaveAllChanges}*/}
+                {/*        disabled={!hasChanges || isSaving}*/}
+                {/*        size="sm"*/}
+                {/*        className="sm:size-default"*/}
+                {/*    >*/}
+                {/*        {isSaving ? "Saving..." : "Save All Changes"}*/}
+                {/*        <Save className="w-4 h-4 ml-2" />*/}
+                {/*    </Button>*/}
+                {/*</div>*/}
             </main>
         </div>
     )

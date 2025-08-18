@@ -35,7 +35,6 @@ const vehicleSchema = z.object({
     type: z.string().min(1, "Type is required"),
     tonnage: z.number().min(0.1, "Tonnage must be greater than 0"),
     fuelConsumptionPerKm: z.number().min(0.01, "Fuel consumption must be greater than 0"),
-    baseRatePerKm: z.number().min(0.01, "Base rate must be greater than 0"),
     insuranceNumber: z.string().min(1, "Insurance number is required"),
     insuranceExpiryDate: z.string().min(1, "Insurance expiry date is required"),
 })
@@ -49,7 +48,6 @@ interface Vehicle {
     type: string
     tonnage: number
     fuelConsumptionPerKm: number
-    baseRatePerKm: number
     insuranceNumber: string
     insuranceExpiryDate: string
     status?: string
@@ -74,7 +72,6 @@ export function MyFleet() {
             type: "",
             tonnage: 0,
             fuelConsumptionPerKm: 0,
-            baseRatePerKm: 0,
             insuranceNumber: "",
             insuranceExpiryDate: "",
         },
@@ -153,7 +150,6 @@ export function MyFleet() {
             type: vehicle.type,
             tonnage: vehicle.tonnage,
             fuelConsumptionPerKm: vehicle.fuelConsumptionPerKm,
-            baseRatePerKm: vehicle.baseRatePerKm,
             insuranceNumber: vehicle.insuranceNumber,
             insuranceExpiryDate: vehicle.insuranceExpiryDate,
         })
@@ -204,7 +200,6 @@ export function MyFleet() {
             type: "",
             tonnage: 0,
             fuelConsumptionPerKm: 0,
-            baseRatePerKm: 0,
             insuranceNumber: "",
             insuranceExpiryDate: "",
         })
@@ -365,28 +360,6 @@ export function MyFleet() {
                                     />
                                     <FormField
                                         control={form.control}
-                                        name="baseRatePerKm"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Base Rate (Ksh/km)</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="number"
-                                                        step="0.01"
-                                                        placeholder="25.0"
-                                                        {...field}
-                                                        onChange={(e) => field.onChange(Number.parseFloat(e.target.value) || 0)}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <FormField
-                                        control={form.control}
                                         name="insuranceNumber"
                                         render={({ field }) => (
                                             <FormItem>
@@ -398,20 +371,21 @@ export function MyFleet() {
                                             </FormItem>
                                         )}
                                     />
-                                    <FormField
-                                        control={form.control}
-                                        name="insuranceExpiryDate"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Insurance Expiry Date</FormLabel>
-                                                <FormControl>
-                                                    <Input type="date" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
                                 </div>
+
+                                <FormField
+                                    control={form.control}
+                                    name="insuranceExpiryDate"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Insurance Expiry Date</FormLabel>
+                                            <FormControl>
+                                                <Input type="date" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
                                 <DialogFooter>
                                     <Button type="submit" disabled={isSubmitting}>
@@ -563,28 +537,6 @@ export function MyFleet() {
                                     />
                                     <FormField
                                         control={form.control}
-                                        name="baseRatePerKm"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Base Rate (Ksh/km)</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="number"
-                                                        step="0.01"
-                                                        placeholder="25.0"
-                                                        {...field}
-                                                        onChange={(e) => field.onChange(Number.parseFloat(e.target.value) || 0)}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <FormField
-                                        control={form.control}
                                         name="insuranceNumber"
                                         render={({ field }) => (
                                             <FormItem>
@@ -596,20 +548,21 @@ export function MyFleet() {
                                             </FormItem>
                                         )}
                                     />
-                                    <FormField
-                                        control={form.control}
-                                        name="insuranceExpiryDate"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Insurance Expiry Date</FormLabel>
-                                                <FormControl>
-                                                    <Input type="date" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
                                 </div>
+
+                                <FormField
+                                    control={form.control}
+                                    name="insuranceExpiryDate"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Insurance Expiry Date</FormLabel>
+                                            <FormControl>
+                                                <Input type="date" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
                                 <DialogFooter>
                                     <Button type="submit" disabled={isSubmitting}>
@@ -636,7 +589,6 @@ export function MyFleet() {
                                 <TableHead>Vehicle</TableHead>
                                 <TableHead>Type</TableHead>
                                 <TableHead>Tonnage</TableHead>
-                                <TableHead>Rate/km</TableHead>
                                 <TableHead>Insurance Expiry</TableHead>
                                 <TableHead className="text-center">Status</TableHead>
                                 <TableHead className="text-center">Actions</TableHead>
@@ -645,7 +597,7 @@ export function MyFleet() {
                         <TableBody>
                             {safeVehicles.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                                         No vehicles found. Add your first vehicle to get started.
                                     </TableCell>
                                 </TableRow>
@@ -658,7 +610,6 @@ export function MyFleet() {
                                         </TableCell>
                                         <TableCell className="capitalize">{vehicle.type}</TableCell>
                                         <TableCell>{vehicle.tonnage}t</TableCell>
-                                        <TableCell>Ksh{vehicle.baseRatePerKm}</TableCell>
                                         <TableCell>{new Date(vehicle.insuranceExpiryDate).toLocaleDateString()}</TableCell>
                                         <TableCell className="text-center">
                                             <Badge variant={getStatusVariant(vehicle.status)}>{vehicle.status || "Available"}</Badge>

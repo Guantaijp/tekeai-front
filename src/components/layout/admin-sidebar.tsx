@@ -84,18 +84,18 @@ export function AdminSidebar() {
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
-        <SidebarMenuItem>
-          <SidebarMenuButton
-            asChild
-            isActive={activeView === 'settings'}
-            tooltip="Settings"
-          >
-            <Link href="/admin?view=settings" className="group">
-              <Settings className={iconClassName('settings')} />
-              <span>Settings</span>
-            </Link>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
+        {/*<SidebarMenuItem>*/}
+        {/*  <SidebarMenuButton*/}
+        {/*    asChild*/}
+        {/*    isActive={activeView === 'settings'}*/}
+        {/*    tooltip="Settings"*/}
+        {/*  >*/}
+        {/*    <Link href="/admin?view=settings" className="group">*/}
+        {/*      <Settings className={iconClassName('settings')} />*/}
+        {/*      <span>Settings</span>*/}
+        {/*    </Link>*/}
+        {/*  </SidebarMenuButton>*/}
+        {/*</SidebarMenuItem>*/}
       </SidebarMenu>
     </Sidebar>
   );

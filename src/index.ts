@@ -138,10 +138,9 @@ export const pricingService = {
     updatePricingRule: async (id: string, data: UpdatePricingRuleDto) => {
         return api.patch<ApiResponse<PricingRule>>(`/pricing/rules/${id}`, data)
     },
-    deletePriceRule:async(id:string,data:DeletePriceRuleDto) => {
-        return api.patch(`/pricing/rules/${id}`, data)
-
-}
+    deletePriceRule: async (id: string) => {
+        return api.del<ApiResponse<{ message: string }>>(`/pricing/rules/${id}/delete`)
+    }
 }
 
 export const transporterService = {

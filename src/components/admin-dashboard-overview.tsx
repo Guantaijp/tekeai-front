@@ -308,31 +308,6 @@ export function AdminDashboardOverview() {
                     </CardContent>
                 </Card>
             </div>
-
-            <div className="grid gap-6 md:grid-cols-2">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Customer Retention</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex justify-center">
-                        <CircularProgress
-                            percentage={92.5}
-                            label="Customer Retention"
-                            sublabel="+1.5% from last month"
-                            color="blue"
-                        />
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Churn Rate</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex justify-center">
-                        <CircularProgress percentage={7.5} label="Churn Rate" sublabel="-1.5% from last month" color="red" />
-                    </CardContent>
-                </Card>
-            </div>
-
             <div className="grid gap-6 md:grid-cols-2">
                 <Card>
                     <CardHeader>
@@ -413,6 +388,32 @@ export function AdminDashboardOverview() {
                     </CardContent>
                 </Card>
             </div>
+
+            <div className="grid gap-6 md:grid-cols-2">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Customer Retention</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex justify-center">
+                        <CircularProgress
+                            percentage={92.5}
+                            label="Customer Retention"
+                            sublabel="+1.5% from last month"
+                            color="blue"
+                        />
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Churn Rate</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex justify-center">
+                        <CircularProgress percentage={7.5} label="Churn Rate" sublabel="-1.5% from last month" color="red" />
+                    </CardContent>
+                </Card>
+            </div>
+
+
 
             <div className="grid gap-6 md:grid-cols-2">
                 <Card>

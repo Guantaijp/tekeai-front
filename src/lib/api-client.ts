@@ -1,6 +1,5 @@
 import axios, { type AxiosInstance, type AxiosResponse, type AxiosError } from "axios"
 
-// Use the BACKEND_URL environment variable, defaulting to localhost:3001
 // const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000/"
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://teke-back-1-ten.vercel.app/"
 
@@ -11,10 +10,8 @@ const apiClient: AxiosInstance = axios.create({
     },
 })
 
-// Optional: Add an interceptor to include authorization token
 apiClient.interceptors.request.use(
     (config) => {
-        // Example: Get token from localStorage or a global state management
         const token = localStorage.getItem('authToken');
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
@@ -26,13 +23,10 @@ apiClient.interceptors.request.use(
     },
 )
 
-// Optional: Add an interceptor for response error handling
 apiClient.interceptors.response.use(
     (response) => response,
     (error: AxiosError) => {
         if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
             console.error("API Error Response:", error.response.data)
             console.error("API Error Status:", error.response.status)
             console.error("API Error Headers:", error.response.headers)

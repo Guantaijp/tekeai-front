@@ -309,3 +309,109 @@ export interface ShipmentCreationResponseData {
         margin: number
     }
 }
+
+// Types for Order Management
+export interface Order {
+    id: number
+    orderNumber: string
+    type: OrderType
+    status: OrderStatus
+    buyerEmail?: string
+    totalAmount: number
+    createdAt: string
+    updatedAt: string
+    items: OrderItem[]
+    lpoFilePath?: string
+    cancellationReason?: string
+}
+
+export interface OrderItem {
+    id: number
+    productName: string
+    quantity: number
+    unitPrice: number
+    totalPrice: number
+}
+
+export enum OrderType {
+    PURCHASE = 'PURCHASE',
+    SALE = 'SALE',
+    TRANSFER = 'TRANSFER'
+}
+
+export enum OrderStatus {
+    PENDING = 'PENDING',
+    APPROVED = 'APPROVED',
+    REJECTED = 'REJECTED',
+    DISPATCH = 'DISPATCH',
+    DELIVERED = 'DELIVERED',
+    CANCELLED = 'CANCELLED'
+}
+
+export interface CreateOrderDto {
+    type: OrderType
+    buyerEmail?: string
+    items: Omit<OrderItem, 'id'>[]
+    notes?: string
+    expectedDeliveryDate?: string
+}
+
+export interface UpdateOrderStatusDto {
+    status: OrderStatus
+    notes?: string
+}
+
+export interface SendOrderInviteDto {
+    customerEmail: string
+    message?: string
+}
+
+export interface OrderFilters {
+    type?: OrderType
+    status?: OrderStatus
+    page?: number
+    limit?: number
+}
+
+export interface OrderSearchParams {
+    q: string
+    type?: OrderType
+}
+
+export interface OrderStats {
+    totalOrders: number
+    pendingOrders: number
+    approvedOrders: number
+    dispatchedOrders: number
+    deliveredOrders: number
+    cancelledOrders: number
+    totalRevenue: number
+    averageOrderValue: number
+}
+
+export interface PaginatedOrders {
+    orders: Order[]
+    totalCount: number
+    totalPages: number
+    currentPage: number
+    hasNextPage: boolean
+    hasPreviousPage: boolean
+}
+
+export interface UploadLPOResponse {
+    message: string
+    order: Order
+    fileUrl: string
+}
+
+export interface OrderInviteResponse {
+    message: string
+    orderLink: string
+}
+
+export interface ApiResponse<T> {
+    success: boolean
+    data: T
+    message?: string
+    errors?: string[]
+}

@@ -50,6 +50,18 @@ export function AppSidebar() {
         </SidebarMenuItem>
         <SidebarMenuItem>
           <SidebarMenuButton
+              asChild
+              isActive={activeView === 'order-management'}
+              tooltip="Order Management"
+          >
+            <Link href="/dashboard?view=order-management" className="group">
+              <Package2 className={iconClassName('order-management')} />
+              <span>Order Management</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+        <SidebarMenuItem>
+          <SidebarMenuButton
             asChild
             isActive={activeView === 'new-request'}
             tooltip="New Request"

@@ -31,12 +31,12 @@ export enum OrderType {
 }
 
 export enum OrderStatus {
-    PENDING = "PENDING",
-    APPROVED = "APPROVED",
-    REJECTED = "REJECTED",
-    DISPATCH = "DISPATCH",
-    DELIVERED = "DELIVERED",
-    CANCELLED = "CANCELLED",
+    PENDING = "Pending",
+    APPROVED = "Approved",
+    REJECTED = "Rejected",
+    DISPATCH = "Dispatched",
+    DELIVERED = "Delivered",
+    CANCELLED = "Cancelled",
 }
 
 export interface CreateOrderDto {

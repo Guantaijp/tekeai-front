@@ -109,16 +109,31 @@ export function OrderManagementDashboard() {
 
             const response = await orderService.getReceivedOrders({ page, limit })
 
-            if (response.data.success) {
-                const orders = response.data.data.orders.map((order: any) => transformOrder(order, "received"))
+            // Handle the actual response structure based on your API response
+            const responseData = response.data || response
+
+            if (responseData.orders) {
+                const orders = responseData.orders.map((order: any) => transformOrder(order, "received"))
                 setReceivedOrders(orders)
                 setFilteredReceivedOrders(orders)
                 setPagination((prev) => ({
                     ...prev,
                     received: {
-                        page: response.data.data.currentPage,
+                        page: page, // Use the requested page since API doesn't return currentPage
                         limit,
-                        totalPages: response.data.data.totalPages,
+                        totalPages: responseData.totalPages || Math.ceil((responseData.total || 0) / limit),
+                    },
+                }))
+            } else {
+                // Handle case where no orders are returned
+                setReceivedOrders([])
+                setFilteredReceivedOrders([])
+                setPagination((prev) => ({
+                    ...prev,
+                    received: {
+                        page: 1,
+                        limit,
+                        totalPages: 1,
                     },
                 }))
             }
@@ -126,7 +141,7 @@ export function OrderManagementDashboard() {
             console.error("Error fetching received orders:", error)
             setErrors((prev) => ({
                 ...prev,
-                received: error.message || "Failed to fetch received orders",
+                received: error.response?.data?.message || error.message || "Failed to fetch received orders",
             }))
         } finally {
             setLoading((prev) => ({ ...prev, received: false }))
@@ -141,16 +156,31 @@ export function OrderManagementDashboard() {
 
             const response = await orderService.getSentOrders({ page, limit })
 
-            if (response.data.success) {
-                const orders = response.data.data.orders.map((order: any) => transformOrder(order, "sent"))
+            // Handle the actual response structure based on your API response
+            const responseData = response.data || response
+
+            if (responseData.orders) {
+                const orders = responseData.orders.map((order: any) => transformOrder(order, "sent"))
                 setSentOrders(orders)
                 setFilteredSentOrders(orders)
                 setPagination((prev) => ({
                     ...prev,
                     sent: {
-                        page: response.data.data.currentPage,
+                        page: page, // Use the requested page since API doesn't return currentPage
                         limit,
-                        totalPages: response.data.data.totalPages,
+                        totalPages: responseData.totalPages || Math.ceil((responseData.total || 0) / limit),
+                    },
+                }))
+            } else {
+                // Handle case where no orders are returned
+                setSentOrders([])
+                setFilteredSentOrders([])
+                setPagination((prev) => ({
+                    ...prev,
+                    sent: {
+                        page: 1,
+                        limit,
+                        totalPages: 1,
                     },
                 }))
             }
@@ -158,7 +188,7 @@ export function OrderManagementDashboard() {
             console.error("Error fetching sent orders:", error)
             setErrors((prev) => ({
                 ...prev,
-                sent: error.message || "Failed to fetch sent orders",
+                sent: error.response?.data?.message || error.message || "Failed to fetch sent orders",
             }))
         } finally {
             setLoading((prev) => ({ ...prev, sent: false }))

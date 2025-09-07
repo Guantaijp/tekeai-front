@@ -99,7 +99,7 @@ export function CreateOrderModal({ children, onOrderCreated }: CreateOrderModalP
 
       // Prepare API data
       const orderData = {
-        type: OrderType.PURCHASE, // This is an order we're sending (we're buying)
+        type: "sent",
         buyerEmail: formData.supplierEmail, // In this context, we're the buyer
         items: validItems.map(item => ({
           description: item.description.trim(),
@@ -114,9 +114,10 @@ export function CreateOrderModal({ children, onOrderCreated }: CreateOrderModalP
       // Call the API
       const response = await orderService.createOrder(orderData as any)
 
-      if (response.data.success) {
-        const newOrder = response.data.data
+      // Handle the response structure - the order data is returned directly
+      const newOrder = response.data || response
 
+      if (newOrder && newOrder.id) {
         // Upload LPO if provided
         if (formData.lpoFile && newOrder.id) {
           try {
@@ -134,7 +135,7 @@ export function CreateOrderModal({ children, onOrderCreated }: CreateOrderModalP
           description: `Order ${newOrder.orderNumber} has been sent to the supplier.`,
         })
 
-        // Reset form
+        // Reset form and close modal
         setFormData({
           supplierEmail: "",
           notes: "",
@@ -143,19 +144,20 @@ export function CreateOrderModal({ children, onOrderCreated }: CreateOrderModalP
         })
         setItems([{ id: "1", description: "", quantity: 1, unitPrice: 0 }])
         setOpen(false)
+      } else {
+        throw new Error("Order was not created properly")
       }
     } catch (error: any) {
       console.error("Error creating order:", error)
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to create order. Please try again.",
+        description: error.response?.data?.message || error.message || "Failed to create order. Please try again.",
         variant: "destructive",
       })
     } finally {
       setIsLoading(false)
     }
   }
-
   return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>

@@ -77,6 +77,18 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
     return items.reduce((total, item) => total + (item.quantity * item.unitPrice), 0)
   }
 
+  const resetForm = () => {
+    setFormData({
+      buyerName: "",
+      buyerEmail: "",
+      destination: "",
+      notes: "",
+      expectedDeliveryDate: "",
+      lpoFile: null,
+    })
+    setItems([{ id: "1", description: "", quantity: 1, unitPrice: 0 }])
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -122,7 +134,7 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
 
       // Prepare API data matching your DTO structure
       const orderData = {
-        type: OrderType.RECEIVED, // Changed from SALE to RECEIVED
+        type: "received", // Changed from SALE to RECEIVED
         buyerName: formData.buyerName.trim(),
         buyerEmail: formData.buyerEmail.trim() || undefined,
         destination: formData.destination.trim(),
@@ -139,9 +151,10 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
       // Call the API
       const response = await orderService.addReceivedOrder(orderData as any)
 
-      if (response.data.success) {
-        const newOrder = response.data.data
+      // Check if response contains the order data directly or nested in data
+      const newOrder = response.data || response
 
+      if (newOrder && newOrder.id) {
         // Upload LPO if provided
         if (formData.lpoFile && newOrder.id) {
           try {
@@ -152,6 +165,7 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
           }
         }
 
+        // Call the callback with the new order
         onOrderAdded?.(newOrder)
 
         toast({
@@ -159,28 +173,27 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
           description: `Order ${newOrder.orderNumber} has been added to your received orders.`,
         })
 
-        // Reset form
-        setFormData({
-          buyerName: "",
-          buyerEmail: "",
-          destination: "",
-          notes: "",
-          expectedDeliveryDate: "",
-          lpoFile: null,
-        })
-        setItems([{ id: "1", description: "", quantity: 1, unitPrice: 0 }])
+        // Reset form and close modal
+        resetForm()
         setOpen(false)
+      } else {
+        throw new Error("Order was not created properly")
       }
     } catch (error: any) {
       console.error("Error adding received order:", error)
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to add order. Please try again.",
+        description: error.response?.data?.message || error.message || "Failed to add order. Please try again.",
         variant: "destructive",
       })
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleClose = () => {
+    setOpen(false)
+    resetForm()
   }
 
   return (
@@ -197,7 +210,7 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
           <DialogHeader>
             <div className="flex items-center justify-between">
               <DialogTitle>Add Received Order</DialogTitle>
-              <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
+              <Button variant="ghost" size="sm" onClick={handleClose}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -338,7 +351,7 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
             </div>
 
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button type="button" variant="outline" onClick={handleClose}>
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>

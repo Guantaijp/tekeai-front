@@ -34,7 +34,7 @@ export enum OrderStatus {
     PENDING = "Pending",
     APPROVED = "Approved",
     REJECTED = "Rejected",
-    DISPATCH = "Dispatched",
+    DISPATCH = "Dispatch",
     DELIVERED = "Delivered",
     CANCELLED = "Cancelled",
 }

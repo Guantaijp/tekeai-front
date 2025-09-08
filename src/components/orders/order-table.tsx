@@ -34,7 +34,7 @@ export function OrderTable({ orders, type, onStatusChange, onViewDetails, loadin
     if (type === "received") {
       switch (currentStatus) {
         case "Received":
-          return ["Approved", "Rejected"]
+          return ["Approved", "Cancelled"]
         case "Approved":
           return ["Dispatch", "Cancelled"]
         case "Dispatch":

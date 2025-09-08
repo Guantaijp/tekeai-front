@@ -9,6 +9,7 @@ import { OrderFilters } from "@/components/orders/order-filters"
 import { ShareOrderingLinkModal } from "@/components/orders/share-ordering-link-modal"
 import { AddReceivedOrderModal } from "@/components/orders/add-received-order-modal"
 import { CreateOrderModal } from "@/components/orders/create-order-modal"
+import { OrderDetailsModal } from "@/components/orders/order-details-modal" // Import the new modal
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import type { OrderStatus } from "@/components/orders/order-status-badge"
 import { orderService, OrderStatus as ApiOrderStatus } from "@/order-management"
@@ -25,18 +26,27 @@ interface ErrorState {
     stats: string | null
 }
 
+// Extended Order interface to include the numeric database ID
+interface ExtendedOrder extends Order {
+    dbId: number // Add the numeric database ID
+}
+
 export function OrderManagementDashboard() {
     const [activeTab, setActiveTab] = useState("received")
 
-    // API Data State
-    const [receivedOrders, setReceivedOrders] = useState<Order[]>([])
+    // API Data State - Updated to use ExtendedOrder
+    const [receivedOrders, setReceivedOrders] = useState<ExtendedOrder[]>([])
     console.log("recievedOrders", receivedOrders)
-    const [sentOrders, setSentOrders] = useState<Order[]>([])
+    const [sentOrders, setSentOrders] = useState<ExtendedOrder[]>([])
     const [orderStats, setOrderStats] = useState(null)
 
-    // Filtered Data State
-    const [filteredReceivedOrders, setFilteredReceivedOrders] = useState<Order[]>([])
-    const [filteredSentOrders, setFilteredSentOrders] = useState<Order[]>([])
+    // Filtered Data State - Updated to use ExtendedOrder
+    const [filteredReceivedOrders, setFilteredReceivedOrders] = useState<ExtendedOrder[]>([])
+    const [filteredSentOrders, setFilteredSentOrders] = useState<ExtendedOrder[]>([])
+
+    // Modal State
+    const [selectedOrder, setSelectedOrder] = useState<ExtendedOrder | null>(null)
+    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false)
 
     // Loading & Error States
     const [loading, setLoading] = useState<LoadingState>({
@@ -57,9 +67,10 @@ export function OrderManagementDashboard() {
     })
 
     // Transform API order to component order format
-    const transformOrder = (apiOrder: any, type: "received" | "sent"): Order => {
+    const transformOrder = (apiOrder: any, type: "received" | "sent"): ExtendedOrder => {
         return {
-            id: apiOrder.orderNumber,
+            id: apiOrder.orderNumber, // Keep as order number for display
+            dbId: apiOrder.id, // Store the numeric database ID
             date: new Date(apiOrder.createdAt).toISOString().split("T")[0],
             items: apiOrder.items.map((item: any) => item.productName).join(", "),
             quantity: apiOrder.items.reduce((sum: number, item: any) => sum + item.quantity, 0),
@@ -77,10 +88,10 @@ export function OrderManagementDashboard() {
     // Transform API status to component status
     const transformStatus = (apiStatus: ApiOrderStatus): OrderStatus => {
         const statusMap: Record<ApiOrderStatus, OrderStatus> = {
-            [ApiOrderStatus.PENDING]: "Received",
+            [ApiOrderStatus.RECEIVED]: "Received",
             [ApiOrderStatus.APPROVED]: "Approved",
-            [ApiOrderStatus.REJECTED]: "Rejected",
             [ApiOrderStatus.DISPATCH]: "Dispatch",
+            [ApiOrderStatus.SENT]: "Sent",
             [ApiOrderStatus.DELIVERED]: "Delivered",
             [ApiOrderStatus.CANCELLED]: "Cancelled",
         }
@@ -90,15 +101,14 @@ export function OrderManagementDashboard() {
     // Transform component status back to API status
     const transformStatusToApi = (status: OrderStatus): ApiOrderStatus => {
         const statusMap: Record<OrderStatus, ApiOrderStatus> = {
-            Received: ApiOrderStatus.PENDING,
+            Received: ApiOrderStatus.RECEIVED,
             Approved: ApiOrderStatus.APPROVED,
-            Rejected: ApiOrderStatus.REJECTED,
             Dispatch: ApiOrderStatus.DISPATCH,
+            Sent: ApiOrderStatus.SENT,
             Delivered: ApiOrderStatus.DELIVERED,
             Cancelled: ApiOrderStatus.CANCELLED,
-            Sent: ApiOrderStatus.PENDING,
         }
-        return statusMap[status] || ApiOrderStatus.PENDING
+        return statusMap[status] || ApiOrderStatus.RECEIVED
     }
 
     // Fetch received orders
@@ -225,13 +235,22 @@ export function OrderManagementDashboard() {
         fetchOrderStats()
     }, [])
 
-    // Handle status change
+    // Handle status change - FIXED to use the numeric database ID
     const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
         try {
             const apiStatus = transformStatusToApi(newStatus)
-            const orderIdNum = Number.parseInt(orderId.replace(/\D/g, "")) // Extract number from order ID
 
-            await orderService.updateOrderStatus(orderIdNum, {
+            // Find the order to get its numeric database ID
+            const currentOrders = activeTab === "received" ? receivedOrders : sentOrders
+            const orderToUpdate = currentOrders.find(order => order.id === orderId)
+
+            if (!orderToUpdate) {
+                console.error("Order not found:", orderId)
+                return
+            }
+
+            // Use the numeric database ID from the order object
+            await orderService.updateOrderStatus(orderToUpdate.dbId, {
                 status: apiStatus,
                 notes: `Status updated to ${newStatus}`,
             })
@@ -242,13 +261,26 @@ export function OrderManagementDashboard() {
                     order.id === orderId ? { ...order, status: newStatus } : order,
                 )
                 setReceivedOrders(updatedOrders)
-                setFilteredReceivedOrders(updatedOrders)
+                setFilteredReceivedOrders(
+                    filteredReceivedOrders.map((order) =>
+                        order.id === orderId ? { ...order, status: newStatus } : order,
+                    )
+                )
             } else {
                 const updatedOrders = sentOrders.map((order) =>
                     order.id === orderId ? { ...order, status: newStatus } : order,
                 )
                 setSentOrders(updatedOrders)
-                setFilteredSentOrders(updatedOrders)
+                setFilteredSentOrders(
+                    filteredSentOrders.map((order) =>
+                        order.id === orderId ? { ...order, status: newStatus } : order,
+                    )
+                )
+            }
+
+            // Update selected order if it's the one being updated
+            if (selectedOrder && selectedOrder.id === orderId) {
+                setSelectedOrder({ ...selectedOrder, status: newStatus })
             }
 
             // Refresh stats
@@ -256,7 +288,25 @@ export function OrderManagementDashboard() {
         } catch (error: any) {
             console.error("Error updating order status:", error)
             // You might want to show a toast notification here
+            alert(`Failed to update order status: ${error.response?.data?.message || error.message}`)
         }
+    }
+
+    // Handle view details
+    const handleViewDetails = (orderId: string) => {
+        const currentOrders = activeTab === "received" ? filteredReceivedOrders : filteredSentOrders
+        const order = currentOrders.find(order => order.id === orderId)
+
+        if (order) {
+            setSelectedOrder(order)
+            setIsDetailsModalOpen(true)
+        }
+    }
+
+    // Handle close details modal
+    const handleCloseDetailsModal = () => {
+        setIsDetailsModalOpen(false)
+        setSelectedOrder(null)
     }
 
     // Handle order added
@@ -292,9 +342,9 @@ export function OrderManagementDashboard() {
                 )
 
                 if (activeTab === "received") {
-                    setFilteredReceivedOrders(searchResults.filter((order: Order) => order.type === "received"))
+                    setFilteredReceivedOrders(searchResults.filter((order: ExtendedOrder) => order.type === "received"))
                 } else {
-                    setFilteredSentOrders(searchResults.filter((order: Order) => order.type === "sent"))
+                    setFilteredSentOrders(searchResults.filter((order: ExtendedOrder) => order.type === "sent"))
                 }
             }
         } catch (error: any) {
@@ -436,7 +486,7 @@ export function OrderManagementDashboard() {
                                 orders={filteredReceivedOrders}
                                 type="received"
                                 onStatusChange={handleStatusChange}
-                                onViewDetails={(orderId) => console.log("View details for:", orderId)}
+                                onViewDetails={handleViewDetails}
                                 loading={loading.received}
                             />
                         )}
@@ -479,7 +529,7 @@ export function OrderManagementDashboard() {
                                 orders={filteredSentOrders}
                                 type="sent"
                                 onStatusChange={handleStatusChange}
-                                onViewDetails={(orderId) => console.log("View details for:", orderId)}
+                                onViewDetails={handleViewDetails}
                                 loading={loading.sent}
                             />
                         )}
@@ -509,6 +559,13 @@ export function OrderManagementDashboard() {
                     )}
                 </TabsContent>
             </Tabs>
+
+            {/* Order Details Modal */}
+            <OrderDetailsModal
+                order={selectedOrder}
+                isOpen={isDetailsModalOpen}
+                onClose={handleCloseDetailsModal}
+            />
         </div>
     )
 }

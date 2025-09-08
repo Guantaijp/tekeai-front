@@ -39,7 +39,7 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
     buyerName: "",
     buyerEmail: "",
     destination: "",
-    notes: "",
+    // notes: "",
     expectedDeliveryDate: "",
     lpoFile: null as File | null,
   })
@@ -82,7 +82,7 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
       buyerName: "",
       buyerEmail: "",
       destination: "",
-      notes: "",
+      // notes: "",
       expectedDeliveryDate: "",
       lpoFile: null,
     })
@@ -144,7 +144,7 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
           unitPrice: Number(item.unitPrice)
           // Remove totalPrice - let backend calculate it
         })),
-        notes: formData.notes.trim() || undefined,
+        // notes: formData.notes.trim() || undefined,
         orderDate: formData.expectedDeliveryDate || undefined,
       }
 
@@ -234,7 +234,7 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="buyer-email">Buyer Email (Optional)</Label>
+                <Label htmlFor="buyer-email">Buyer Email</Label>
                 <Input
                     id="buyer-email"
                     type="email"
@@ -259,7 +259,7 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="delivery-date">Order Date (Optional)</Label>
+                <Label htmlFor="delivery-date">Order Date</Label>
                 <Input
                     id="delivery-date"
                     type="date"
@@ -269,18 +269,18 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="notes">Notes (Optional)</Label>
-              <Input
-                  id="notes"
-                  placeholder="Any additional notes about this order"
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              />
-            </div>
+            {/*<div className="space-y-2">*/}
+            {/*  <Label htmlFor="notes">Notes (Optional)</Label>*/}
+            {/*  <Input*/}
+            {/*      id="notes"*/}
+            {/*      placeholder="Any additional notes about this order"*/}
+            {/*      value={formData.notes}*/}
+            {/*      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}*/}
+            {/*  />*/}
+            {/*</div>*/}
 
             <div className="space-y-2">
-              <Label htmlFor="lpo-file">Attach LPO (Optional)</Label>
+              <Label htmlFor="lpo-file">Attach LPO</Label>
               <Input
                   id="lpo-file"
                   type="file"

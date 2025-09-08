@@ -11,7 +11,6 @@ import { AddReceivedOrderModal } from "@/components/orders/add-received-order-mo
 import { CreateOrderModal } from "@/components/orders/create-order-modal"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import type { OrderStatus } from "@/components/orders/order-status-badge"
-// import { orderService } from "@/order-management"
 import { orderService, OrderStatus as ApiOrderStatus } from "@/order-management"
 
 interface LoadingState {
@@ -31,6 +30,7 @@ export function OrderManagementDashboard() {
 
     // API Data State
     const [receivedOrders, setReceivedOrders] = useState<Order[]>([])
+    console.log("recievedOrders", receivedOrders)
     const [sentOrders, setSentOrders] = useState<Order[]>([])
     const [orderStats, setOrderStats] = useState(null)
 
@@ -63,9 +63,9 @@ export function OrderManagementDashboard() {
             date: new Date(apiOrder.createdAt).toISOString().split("T")[0],
             items: apiOrder.items.map((item: any) => item.productName).join(", "),
             quantity: apiOrder.items.reduce((sum: number, item: any) => sum + item.quantity, 0),
-            buyer: type === "received" ? apiOrder.buyerEmail || "Unknown" : undefined,
+            buyer: type === "received" ? apiOrder.buyerName || "Unknown" : undefined,
             supplier: type === "sent" ? "Supplier Name" : undefined,
-            location: type === "received" ? "Location" : undefined,
+            location: type === "received" ?apiOrder.destination || "Location" : undefined,
             destination: type === "sent" ? "Destination" : undefined,
             lpo: !!apiOrder.lpoFilePath,
             amount: apiOrder.totalAmount,
@@ -114,6 +114,7 @@ export function OrderManagementDashboard() {
 
             if (responseData.orders) {
                 const orders = responseData.orders.map((order: any) => transformOrder(order, "received"))
+                console.log("orders",orders)
                 setReceivedOrders(orders)
                 setFilteredReceivedOrders(orders)
                 setPagination((prev) => ({

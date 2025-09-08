@@ -63,12 +63,14 @@ export function OrderTable({ orders, type, onStatusChange, onViewDetails, loadin
             <TableRow>
               <TableHead>Order ID</TableHead>
               <TableHead>Date</TableHead>
-              <TableHead>Items</TableHead>
-              <TableHead>Qty</TableHead>
+
               {type === "received" && <TableHead>Buyer</TableHead>}
-              {type === "sent" && <TableHead>Supplier</TableHead>}
               {type === "received" && <TableHead>Location</TableHead>}
-              {type === "sent" && <TableHead>Destination</TableHead>}
+
+              {/*/!* Show only when type === "sent" AND NOT "insend" *!/*/}
+              {/*{type === "sent" && type !== "insend" && <TableHead>Destination</TableHead>}*/}
+              {/*{type === "sent" && type !== "insend" && <TableHead>Supplier</TableHead>}*/}
+
               <TableHead>LPO</TableHead>
               <TableHead>Amount</TableHead>
               <TableHead>Status</TableHead>
@@ -80,14 +82,14 @@ export function OrderTable({ orders, type, onStatusChange, onViewDetails, loadin
                 <TableRow key={order.id}>
                   <TableCell className="font-medium">{order.id}</TableCell>
                   <TableCell>{order.date}</TableCell>
-                  <TableCell className="max-w-[200px] truncate" title={order.items}>
-                    {order.items}
-                  </TableCell>
-                  <TableCell>{order.quantity}</TableCell>
+                  {/*<TableCell className="max-w-[200px] truncate" title={order.items}>*/}
+                  {/*  {order.items}*/}
+                  {/*</TableCell>*/}
+                  {/*<TableCell>{order.quantity}</TableCell>*/}
                   {type === "received" && <TableCell>{order.buyer}</TableCell>}
-                  {type === "sent" && <TableCell>{order.supplier}</TableCell>}
+                  {/*{type === "sent" && <TableCell>{order.supplier}</TableCell>}*/}
                   {type === "received" && <TableCell>{order.location}</TableCell>}
-                  {type === "sent" && <TableCell>{order.destination}</TableCell>}
+                  {/*{type === "sent" && <TableCell>{order.destination}</TableCell>}*/}
                   <TableCell>
                     {order.lpo ? (
                         <Badge variant="outline" className="gap-1">

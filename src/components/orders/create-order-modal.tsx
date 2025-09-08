@@ -37,7 +37,7 @@ export function CreateOrderModal({ children, onOrderCreated }: CreateOrderModalP
 
   const [formData, setFormData] = useState({
     supplierEmail: "",
-    notes: "",
+    // notes: "",
     expectedDeliveryDate: "",
     lpoFile: null as File | null,
   })
@@ -107,7 +107,7 @@ export function CreateOrderModal({ children, onOrderCreated }: CreateOrderModalP
           unitPrice: Number(item.unitPrice),
           totalPrice: Number(item.quantity) * Number(item.unitPrice)
         })),
-        notes: formData.notes.trim() || undefined,
+        // notes: formData.notes.trim() || undefined,
         expectedDeliveryDate: formData.expectedDeliveryDate || undefined,
       }
 
@@ -138,7 +138,7 @@ export function CreateOrderModal({ children, onOrderCreated }: CreateOrderModalP
         // Reset form and close modal
         setFormData({
           supplierEmail: "",
-          notes: "",
+          // notes: "",
           expectedDeliveryDate: "",
           lpoFile: null,
         })
@@ -196,7 +196,7 @@ export function CreateOrderModal({ children, onOrderCreated }: CreateOrderModalP
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="delivery-date">Expected Delivery Date (Optional)</Label>
+                <Label htmlFor="delivery-date">Expected Delivery Date </Label>
                 <Input
                     id="delivery-date"
                     type="date"
@@ -206,18 +206,18 @@ export function CreateOrderModal({ children, onOrderCreated }: CreateOrderModalP
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="notes">Notes (Optional)</Label>
-              <Input
-                  id="notes"
-                  placeholder="Any additional notes about this order"
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              />
-            </div>
+            {/*<div className="space-y-2">*/}
+            {/*  <Label htmlFor="notes">Notes (Optional)</Label>*/}
+            {/*  <Input*/}
+            {/*      id="notes"*/}
+            {/*      placeholder="Any additional notes about this order"*/}
+            {/*      value={formData.notes}*/}
+            {/*      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}*/}
+            {/*  />*/}
+            {/*</div>*/}
 
             <div className="space-y-2">
-              <Label htmlFor="lpo-file">Attach LPO (Optional)</Label>
+              <Label htmlFor="lpo-file">Attach LPO</Label>
               <Input
                   id="lpo-file"
                   type="file"

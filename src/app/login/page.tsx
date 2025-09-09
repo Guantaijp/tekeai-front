@@ -29,7 +29,7 @@ export default function LoginPage() {
             // In a real app, you'd save the token (response.data.data.token) and user info
             localStorage.setItem("authToken", response.data.data.token)
             localStorage.setItem("userRole", response.data.data.user.role)
-
+            localStorage.setItem("userRole", response.data.data.user.name)
             // Redirect based on the user's role
             switch (response.data.data.user.role) {
                 case "customer":

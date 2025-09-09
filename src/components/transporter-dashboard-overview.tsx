@@ -145,6 +145,15 @@ export function TransporterDashboardOverview() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const [storedName, setStoredName] = useState<string | null>(null)
+    console.log("user name",storedName)
+    console.log(Object.keys(localStorage))
+
+    useEffect(() => {
+        const role = localStorage.getItem("userRole")  // ✅ correct key
+        console.log("Value in localStorage:", role)
+        setStoredName(role)
+    }, [])
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -203,6 +212,16 @@ export function TransporterDashboardOverview() {
 
     return (
         <div className="space-y-6">
+            <div>
+                <h2 className="text-2xl font-bold text-gray-800">
+                    Welcome,{" "}
+                    <span className="text-blue-600">
+                                    {storedName}
+                                  </span>
+                    !
+                </h2>
+                <p className="text-gray-600">Here's your shipment overview</p>
+            </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

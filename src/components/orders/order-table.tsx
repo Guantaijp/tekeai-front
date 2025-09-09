@@ -100,7 +100,7 @@ export function OrderTable({ orders, type, onStatusChange, onViewDetails, loadin
                         <Badge variant="secondary">No</Badge>
                     )}
                   </TableCell>
-                  <TableCell>${order.amount.toLocaleString()}</TableCell>
+                  <TableCell>Ksh {order.amount.toLocaleString()}</TableCell>
                   <TableCell>
                     <OrderStatusBadge status={order.status} />
                   </TableCell>

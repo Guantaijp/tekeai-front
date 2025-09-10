@@ -79,6 +79,35 @@ const chartConfig = {
     }
 } satisfies ChartConfig
 
+// Function to generate last 6 months data for performance chart
+const generateSixMonthsPerformanceData = (apiData: ApiPerformanceData[]): TransformedPerformance[] => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const currentDate = new Date();
+    const sixMonthsData: TransformedPerformance[] = [];
+
+    // Create a map of existing data for quick lookup
+    const dataMap = new Map();
+    apiData.forEach(item => {
+        dataMap.set(item.month, item);
+    });
+
+    // Generate last 6 months
+    for (let i = 5; i >= 0; i--) {
+        const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+        const monthName = months[date.getMonth()];
+
+        // Use existing data if available, otherwise default to 0
+        const existingData = dataMap.get(monthName);
+        sixMonthsData.push({
+            month: monthName,
+            earnings: existingData?.value || 0,
+            jobsDone: existingData?.count || 0
+        });
+    }
+
+    return sixMonthsData;
+};
+
 const getStatusVariant = (status: string): "secondary" | "default" | "outline" | "destructive" | null | undefined => {
     switch (status.toLowerCase()) {
         case 'in progress':
@@ -98,6 +127,24 @@ const getStatusVariant = (status: string): "secondary" | "default" | "outline" |
     }
 };
 
+// Function to get time-based greeting
+const getTimeBasedGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) {
+        return "Good morning";
+    } else if (hour >= 12 && hour < 17) {
+        return "Good afternoon";
+    } else {
+        return "Good evening";
+    }
+};
+
+// Function to extract first name
+const getFirstName = (fullName: string | null) => {
+    if (!fullName) return "";
+    return fullName.split(' ')[0];
+};
+
 // Function to transform API data to component format
 const transformDashboardData = (apiData: ApiDashboardResponse): TransformedDashboardData => {
     // Transform recent jobs
@@ -110,12 +157,8 @@ const transformDashboardData = (apiData: ApiDashboardResponse): TransformedDashb
         payout: job.payout
     }));
 
-    // Transform performance data
-    const transformedPerformance: TransformedPerformance[] = apiData.performanceOverview.map(perf => ({
-        month: perf.month,
-        earnings: perf.value, // Assuming 'value' represents earnings
-        jobsDone: perf.count
-    }));
+    // Transform performance data using the 6-month generator
+    const transformedPerformance = generateSixMonthsPerformanceData(apiData.performanceOverview);
 
     // Calculate growth metrics (mock calculations since not provided by API)
     const completedJobsGrowth = apiData.completionRate ? `${apiData.completionRate}%` : "0%";
@@ -214,13 +257,13 @@ export function TransporterDashboardOverview() {
         <div className="space-y-6">
             <div>
                 <h2 className="text-2xl font-bold text-gray-800">
-                    Welcome,{" "}
+                    {getTimeBasedGreeting()},{" "}
                     <span className="text-blue-600">
-                                    {storedName}
-                                  </span>
+                        {getFirstName(storedName)}
+                    </span>
                     !
                 </h2>
-                <p className="text-gray-600">Here's your shipment overview</p>
+                <p className="text-gray-600">Here's your performance overview</p>
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
@@ -285,7 +328,7 @@ export function TransporterDashboardOverview() {
                 <Card>
                     <CardHeader>
                         <CardTitle className="font-headline">Performance Overview</CardTitle>
-                        <CardDescription>Monthly earnings and jobs completed</CardDescription>
+                        <CardDescription>Monthly earnings and jobs completed (Last 6 months)</CardDescription>
                     </CardHeader>
                     <CardContent>
                         {dashboardData.monthlyPerformance.length > 0 ? (

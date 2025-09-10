@@ -48,10 +48,38 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
+// Function to generate last 6 months data
+const generateSixMonthsData = (apiData: Array<{month: string; value: number; count: number}>) => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const currentDate = new Date();
+    const sixMonthsData = [];
+
+    // Create a map of existing data for quick lookup
+    const dataMap = new Map();
+    apiData.forEach(item => {
+        dataMap.set(item.month, item);
+    });
+
+    // Generate last 6 months
+    for (let i = 5; i >= 0; i--) {
+        const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+        const monthName = months[date.getMonth()];
+
+        // Use existing data if available, otherwise default to 0
+        const existingData = dataMap.get(monthName);
+        sixMonthsData.push({
+            month: monthName,
+            value: existingData?.value || 0,
+            count: existingData?.count || 0
+        });
+    }
+
+    return sixMonthsData;
+};
+
 export function DashboardOverview() {
     const [dashboardData, setDashboardData] = useState<CustomerDashboardData | null>(null);
     const [orderStats, setOrderStats] = useState<OrderStats | null>(null);
-    console.log("orderstat",orderStats)
     const [loading, setLoading] = useState<LoadingState>({
         dashboard: true,
         stats: true
@@ -67,6 +95,24 @@ export function DashboardOverview() {
         console.log("Value in localStorage:", role);
         setStoredName(role);
     }, []);
+
+    // Function to get time-based greeting
+    const getTimeBasedGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour >= 5 && hour < 12) {
+            return "Good morning";
+        } else if (hour >= 12 && hour < 17) {
+            return "Good afternoon";
+        } else {
+            return "Good evening";
+        }
+    };
+
+    // Function to extract first name
+    const getFirstName = (fullName: string | null) => {
+        if (!fullName) return "";
+        return fullName.split(' ')[0];
+    };
 
     const fetchDashboardData = async () => {
         try {
@@ -95,7 +141,7 @@ export function DashboardOverview() {
             console.log(response);
 
             // if (response.data.success) {
-                setOrderStats(response.data);
+            setOrderStats(response.data);
             // }
         } catch (error: any) {
             console.error("Error fetching order stats:", error);
@@ -113,6 +159,11 @@ export function DashboardOverview() {
         fetchOrderStats();
     }, []);
 
+    // Generate 6 months data for the chart
+    const chartData = dashboardData?.shipmentsOverview
+        ? generateSixMonthsData(dashboardData.shipmentsOverview)
+        : [];
+
     const isLoading = loading.dashboard || loading.stats;
     const hasErrors = errors.dashboard || errors.stats;
 
@@ -121,7 +172,7 @@ export function DashboardOverview() {
             <div className="space-y-6">
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                     {[...Array(4)].map((_, i) => (
-                        <Card key={i}>
+                        <Card key={i} className="min-h-[120px]">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
                                 <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
@@ -133,9 +184,9 @@ export function DashboardOverview() {
                         </Card>
                     ))}
                 </div>
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {[...Array(3)].map((_, i) => (
-                        <Card key={i}>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+                    {[...Array(5)].map((_, i) => (
+                        <Card key={i} className="min-h-[120px]">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
                                 <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
@@ -188,107 +239,107 @@ export function DashboardOverview() {
         <div className="space-y-6">
             <div>
                 <h2 className="text-2xl font-bold text-gray-800">
-                    Welcome,{" "}
+                    {getTimeBasedGreeting()},{" "}
                     <span className="text-blue-600">
-                        {storedName}
+                        {getFirstName(storedName)}
                     </span>
                     !
                 </h2>
                 <p className="text-gray-600">Here's your shipment overview</p>
             </div>
 
-            {/* Original Dashboard Cards */}
+            {/* Top 4 Dashboard Cards */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
+                <Card className="min-h-[120px] flex flex-col">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
                         <Package className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-1 flex flex-col justify-between">
                         <div className="text-2xl font-bold">{dashboardData?.totalOrders?.toLocaleString() || 0}</div>
                         <p className="text-xs text-muted-foreground">Sum of all order statuses</p>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="min-h-[120px] flex flex-col">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Active Deliveries</CardTitle>
                         <Truck className="h-4 w-4 text-blue-500" />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-1 flex flex-col justify-between">
                         <div className="text-2xl font-bold">{dashboardData?.activeDeliveries || 0}</div>
                         <p className="text-xs text-muted-foreground">Currently in transit</p>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="min-h-[120px] flex flex-col">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Completed Deliveries</CardTitle>
                         <CheckCircle className="h-4 w-4 text-green-500" />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-1 flex flex-col justify-between">
                         <div className="text-2xl font-bold">{dashboardData?.completedDeliveries || 0}</div>
                         <p className="text-xs text-muted-foreground">Successfully delivered</p>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="min-h-[120px] flex flex-col">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">New Requests</CardTitle>
                         <Activity className="h-4 w-4 text-orange-500" />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-1 flex flex-col justify-between">
                         <div className="text-2xl font-bold">{dashboardData?.newRequests || 0}</div>
                         <p className="text-xs text-muted-foreground">Pending processing</p>
                     </CardContent>
                 </Card>
             </div>
 
-            {/* Order Statistics Cards */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <Card>
+            {/* Bottom 5 Order Statistics Cards */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+                <Card className="min-h-[120px] flex flex-col">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Received Orders</CardTitle>
                         <Package className="h-4 w-4 text-green-500" />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-1 flex flex-col justify-between">
                         <div className="text-2xl font-bold">{orderStats?.receivedOrders || 0}</div>
                         <p className="text-xs text-muted-foreground">Orders received</p>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="min-h-[120px] flex flex-col">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Sent Orders</CardTitle>
                         <Send className="h-4 w-4 text-blue-500" />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-1 flex flex-col justify-between">
                         <div className="text-2xl font-bold">{orderStats?.sentOrders || 0}</div>
                         <p className="text-xs text-muted-foreground">Orders dispatched</p>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="min-h-[120px] flex flex-col">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Pending Approval</CardTitle>
                         <Clock className="h-4 w-4 text-orange-500" />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-1 flex flex-col justify-between">
                         <div className="text-2xl font-bold">{orderStats?.pendingApproval || 0}</div>
                         <p className="text-xs text-muted-foreground">Awaiting approval</p>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="min-h-[120px] flex flex-col">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Ready for Dispatch</CardTitle>
                         <Truck className="h-4 w-4 text-purple-500" />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-1 flex flex-col justify-between">
                         <div className="text-2xl font-bold">{orderStats?.readyForDispatch || 0}</div>
                         <p className="text-xs text-muted-foreground">Ready to ship</p>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="min-h-[120px] flex flex-col">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
                         <DollarSign className="h-4 w-4 text-green-600" />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-1 flex flex-col justify-between">
                         <div className="text-2xl font-bold">Ksh{orderStats?.totalRevenue?.toFixed(2) || '0.00'}</div>
                         <p className="text-xs text-muted-foreground">Total earnings</p>
                     </CardContent>
@@ -299,12 +350,12 @@ export function DashboardOverview() {
             <Card>
                 <CardHeader>
                     <CardTitle className="font-headline">Shipments Overview</CardTitle>
-                    <CardDescription>Monthly shipments data</CardDescription>
+                    <CardDescription>Monthly shipments data (Last 6 months)</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <ChartContainer config={chartConfig} className="h-[250px] w-full">
                         <ResponsiveContainer>
-                            <BarChart accessibilityLayer data={dashboardData?.shipmentsOverview || []}>
+                            <BarChart accessibilityLayer data={chartData}>
                                 <XAxis
                                     dataKey="month"
                                     tickLine={false}

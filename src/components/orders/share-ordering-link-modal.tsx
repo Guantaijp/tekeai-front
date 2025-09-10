@@ -13,8 +13,20 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Share2, Copy, Check } from "lucide-react"
+import { Share2, Copy, Check, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import {orderService} from "@/order-management";
+
+// Import your order service
+
+// Define the DTO interface if not already imported
+interface SendOrderInviteDto {
+  customerEmail: string
+  orderLink: string
+  message?: string
+  supplierName?: string
+  // Add other fields as needed based on your backend DTO
+}
 
 export function ShareOrderingLinkModal() {
   const [open, setOpen] = useState(false)
@@ -22,6 +34,7 @@ export function ShareOrderingLinkModal() {
   const [message, setMessage] = useState("")
   const [orderLink, setOrderLink] = useState("")
   const [copied, setCopied] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
   const generateOrderLink = () => {
@@ -59,30 +72,69 @@ export function ShareOrderingLinkModal() {
       return
     }
 
+    if (!orderLink) {
+      toast({
+        title: "Link required",
+        description: "Please generate an ordering link first.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsLoading(true)
+
     try {
-      // Here you would call your API to send the invite
-      // await orderService.sendOrderInvite({ customerEmail, message })
+      // Prepare the invite data
+      const inviteData: SendOrderInviteDto = {
+        customerEmail,
+        orderLink,
+        message: message || undefined,
+        supplierName: "Your Company Name", // Replace with actual supplier name
+        // Add other required fields based on your DTO
+      }
+
+      // Call your API to send the invite
+      const response = await orderService.sendOrderInvite(inviteData)
 
       toast({
         title: "Invite sent!",
         description: `Ordering link has been sent to ${customerEmail}`,
       })
 
+      // Reset form and close modal
       setOpen(false)
       setCustomerEmail("")
       setMessage("")
       setOrderLink("")
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Failed to send invite:", error)
+
       toast({
         title: "Failed to send invite",
-        description: "Please try again later.",
+        description: error?.response?.data?.message || "Please try again later.",
         variant: "destructive",
       })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen && !isLoading) {
+      // Only allow closing if not loading
+      setOpen(false)
+      // Reset form when closing
+      setCustomerEmail("")
+      setMessage("")
+      setOrderLink("")
+      setCopied(false)
+    } else if (newOpen) {
+      setOpen(true)
     }
   }
 
   return (
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogTrigger asChild>
           <Button variant="outline" className="gap-2 bg-transparent">
             <Share2 className="h-4 w-4" />
@@ -106,6 +158,7 @@ export function ShareOrderingLinkModal() {
                   placeholder="customer@example.com"
                   value={customerEmail}
                   onChange={(e) => setCustomerEmail(e.target.value)}
+                  disabled={isLoading}
               />
             </div>
 
@@ -117,11 +170,16 @@ export function ShareOrderingLinkModal() {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   rows={3}
+                  disabled={isLoading}
               />
             </div>
 
             {!orderLink && (
-                <Button onClick={generateOrderLink} className="w-full">
+                <Button
+                    onClick={generateOrderLink}
+                    className="w-full"
+                    disabled={isLoading}
+                >
                   Generate Ordering Link
                 </Button>
             )}
@@ -131,7 +189,12 @@ export function ShareOrderingLinkModal() {
                   <Label>Generated Link</Label>
                   <div className="flex gap-2">
                     <Input value={orderLink} readOnly />
-                    <Button variant="outline" size="icon" onClick={copyToClipboard}>
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={copyToClipboard}
+                        disabled={isLoading}
+                    >
                       {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     </Button>
                   </div>
@@ -139,11 +202,27 @@ export function ShareOrderingLinkModal() {
             )}
 
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setOpen(false)} className="flex-1">
+              <Button
+                  variant="outline"
+                  onClick={() => handleOpenChange(false)}
+                  className="flex-1"
+                  disabled={isLoading}
+              >
                 Cancel
               </Button>
-              <Button onClick={sendInvite} disabled={!orderLink} className="flex-1">
-                Send Invite
+              <Button
+                  onClick={sendInvite}
+                  disabled={!orderLink || isLoading}
+                  className="flex-1"
+              >
+                {isLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Sending...
+                    </>
+                ) : (
+                    "Send Invite"
+                )}
               </Button>
             </div>
           </div>

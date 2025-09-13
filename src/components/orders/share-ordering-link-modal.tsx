@@ -38,9 +38,8 @@ export function ShareOrderingLinkModal() {
   const { toast } = useToast()
 
   const generateOrderLink = () => {
-    // Generate a unique ordering link
-    const linkId = Math.random().toString(36).substring(2, 15)
-    const link = `${window.location.origin}/order/${linkId}`
+    // Generate the ordering link using the specified domain
+    const link = `https://tekeai-front-two.vercel.app/orders`
     setOrderLink(link)
   }
 
@@ -72,22 +71,16 @@ export function ShareOrderingLinkModal() {
       return
     }
 
-    if (!orderLink) {
-      toast({
-        title: "Link required",
-        description: "Please generate an ordering link first.",
-        variant: "destructive",
-      })
-      return
-    }
-
     setIsLoading(true)
 
     try {
+      // Use the fixed ordering link
+      const fixedOrderLink = "https://tekeai-front-two.vercel.app/orders"
+
       // Prepare the invite data
       const inviteData: SendOrderInviteDto = {
         customerEmail,
-        orderLink,
+        orderLink: fixedOrderLink,
         message: message || undefined,
         supplierName: "Your Company Name", // Replace with actual supplier name
         // Add other required fields based on your DTO

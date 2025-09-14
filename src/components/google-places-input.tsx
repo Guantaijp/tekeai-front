@@ -438,7 +438,7 @@ export default function GooglePlacesDemo() {
 
     return (
         <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-            <h1 className="text-2xl font-bold text-gray-900 mb-6">Google Places Autocomplete</h1>
+            {/*<h1 className="text-2xl font-bold text-gray-900 mb-6">Google Places Autocomplete</h1>*/}
 
             <div className="space-y-6">
                 {/* Origin */}

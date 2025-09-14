@@ -17,12 +17,22 @@ import { Label } from "@/components/ui/label"
 import { Plus, X, Trash2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { orderService, OrderType } from "@/order-management"
+import {GooglePlacesInput} from "@/components/google-places-input";
 
 interface OrderItem {
   id: string
   description: string
   quantity: number
   unitPrice: number
+}
+
+interface LocationData {
+  address: string
+  coordinates: {
+    lat: number
+    lng: number
+  }
+  placeId?: string
 }
 
 interface AddReceivedOrderModalProps {
@@ -38,11 +48,15 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
   const [formData, setFormData] = useState({
     buyerName: "",
     buyerEmail: "",
-    destination: "",
-    // notes: "",
     expectedDeliveryDate: "",
     lpoFile: null as File | null,
   })
+
+  // Location states
+  const [originValue, setOriginValue] = useState("")
+  const [destinationValue, setDestinationValue] = useState("")
+  const [originLocation, setOriginLocation] = useState<LocationData | null>(null)
+  const [destinationLocation, setDestinationLocation] = useState<LocationData | null>(null)
 
   const [items, setItems] = useState<OrderItem[]>([{
     id: "1",
@@ -81,12 +95,16 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
     setFormData({
       buyerName: "",
       buyerEmail: "",
-      destination: "",
-      // notes: "",
       expectedDeliveryDate: "",
       lpoFile: null,
     })
     setItems([{ id: "1", description: "", quantity: 1, unitPrice: 0 }])
+
+    // Reset location states
+    setOriginValue("")
+    setDestinationValue("")
+    setOriginLocation(null)
+    setDestinationLocation(null)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -122,10 +140,20 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
         return
       }
 
-      if (!formData.destination.trim()) {
+      if (!originLocation) {
         toast({
           title: "Validation Error",
-          description: "Destination is required.",
+          description: "Origin location is required.",
+          variant: "destructive",
+        })
+        setIsLoading(false)
+        return
+      }
+
+      if (!destinationLocation) {
+        toast({
+          title: "Validation Error",
+          description: "Destination location is required.",
           variant: "destructive",
         })
         setIsLoading(false)
@@ -137,14 +165,21 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
         type: "received", // Changed from SALE to RECEIVED
         buyerName: formData.buyerName.trim(),
         buyerEmail: formData.buyerEmail.trim() || undefined,
-        destination: formData.destination.trim(),
+        origin: {
+          address: originLocation.address,
+          coordinates: originLocation.coordinates,
+          placeId: originLocation.placeId
+        },
+        destination: {
+          address: destinationLocation.address,
+          coordinates: destinationLocation.coordinates,
+          placeId: destinationLocation.placeId
+        },
         items: validItems.map(item => ({
           description: item.description.trim(),
           quantity: Number(item.quantity),
           unitPrice: Number(item.unitPrice)
-          // Remove totalPrice - let backend calculate it
         })),
-        // notes: formData.notes.trim() || undefined,
         orderDate: formData.expectedDeliveryDate || undefined,
       }
 
@@ -245,39 +280,55 @@ export function AddReceivedOrderModal({ children, onOrderAdded }: AddReceivedOrd
               </div>
             </div>
 
+            {/* Location Selection */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="destination">Destination *</Label>
-                <Input
-                    id="destination"
-                    type="text"
-                    placeholder="e.g., Nairobi, Kenya"
-                    value={formData.destination}
-                    onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-                    required
+                <GooglePlacesInput
+                    id="origin"
+                    label="Origin (Pickup Location) *"
+                    value={originValue}
+                    onChange={(e) => setOriginValue(e.target.value)}
+                    onPlaceSelected={setOriginLocation}
+                    placeholder="Enter pickup location in Kenya..."
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="delivery-date">Order Date</Label>
-                <Input
-                    id="delivery-date"
-                    type="date"
-                    value={formData.expectedDeliveryDate}
-                    onChange={(e) => setFormData({ ...formData, expectedDeliveryDate: e.target.value })}
+                <GooglePlacesInput
+                    id="destination"
+                    label="Destination (Delivery Location) *"
+                    value={destinationValue}
+                    onChange={(e) => setDestinationValue(e.target.value)}
+                    onPlaceSelected={setDestinationLocation}
+                    placeholder="Enter delivery location in Kenya..."
                 />
               </div>
             </div>
 
-            {/*<div className="space-y-2">*/}
-            {/*  <Label htmlFor="notes">Notes (Optional)</Label>*/}
-            {/*  <Input*/}
-            {/*      id="notes"*/}
-            {/*      placeholder="Any additional notes about this order"*/}
-            {/*      value={formData.notes}*/}
-            {/*      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}*/}
-            {/*  />*/}
-            {/*</div>*/}
+            {/* Show selected locations summary */}
+            {(originLocation || destinationLocation) && (
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                  <h4 className="text-sm font-medium text-blue-800 mb-2">Selected Locations:</h4>
+                  <div className="space-y-1 text-sm text-blue-700">
+                    {originLocation && (
+                        <div><span className="font-medium">From:</span> {originLocation.address}</div>
+                    )}
+                    {destinationLocation && (
+                        <div><span className="font-medium">To:</span> {destinationLocation.address}</div>
+                    )}
+                  </div>
+                </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="delivery-date">Order Date</Label>
+              <Input
+                  id="delivery-date"
+                  type="date"
+                  value={formData.expectedDeliveryDate}
+                  onChange={(e) => setFormData({ ...formData, expectedDeliveryDate: e.target.value })}
+              />
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="lpo-file">Attach LPO</Label>

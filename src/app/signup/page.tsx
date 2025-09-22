@@ -108,7 +108,7 @@ export default function SignupPage() {
                                 onChange={(e) => setPassword(e.target.value)}
                             />
                         </div>
-                        <div className="grid gap-2">
+                        <div className="grid gap-2 ">
                             <Label>I am a...</Label>
                             <RadioGroup
                                 defaultValue="customer"
@@ -123,10 +123,10 @@ export default function SignupPage() {
                                     <RadioGroupItem value="transporter" id="transporter" />
                                     <Label htmlFor="transporter">Transporter</Label>
                                 </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="admin" id="admin" />
-                                    <Label htmlFor="admin">Admin</Label>
-                                </div>
+                                {/*<div className="flex items-center space-x-2">*/}
+                                {/*    <RadioGroupItem value="admin" id="admin" />*/}
+                                {/*    <Label htmlFor="admin">Admin</Label>*/}
+                                {/*</div>*/}
                             </RadioGroup>
                         </div>
                         {error && <p className="text-red-500 text-sm text-center">{error}</p>}

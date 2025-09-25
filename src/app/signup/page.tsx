@@ -16,13 +16,24 @@ import type { UserRole } from "@/types/api" // Import UserRole type
 
 export default function SignupPage() {
     const router = useRouter()
-    const [fullname, setFullname] = useState("")
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
     const [role, setRole] = useState<UserRole>("customer") // Use UserRole type
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState<string | null>(null)
+
+    // Common fields
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [phone, setphone] = useState("")
+
+    // Transporter-specific fields
+    const [transporterName, setTransporterName] = useState("")
+    const [idNumber, setIdNumber] = useState("")
+
+    // Customer-specific fields
+    const [companyName, setCompanyName] = useState("")
+    const [location, setLocation] = useState("")
+    const [pin, setPin] = useState("")
 
     const handleSignup = async (event: React.FormEvent) => {
         event.preventDefault()
@@ -31,17 +42,34 @@ export default function SignupPage() {
         setSuccess(null)
 
         try {
-            const response = await authService.register({
-                name: fullname,
+            let registrationData: any = {
                 email,
                 password,
+                phone,
                 role,
-            })
+            }
+
+            if (role === "transporter") {
+                registrationData = {
+                    ...registrationData,
+                    name: transporterName,
+                    idNumber,
+                }
+            } else if (role === "customer") {
+                registrationData = {
+                    ...registrationData,
+                    name: companyName,
+                    location,
+                    pin,
+                }
+            }
+
+            const response = await authService.register(registrationData)
 
             setSuccess(response.data.message || "Registration successful!")
             // In a real app, you'd save the token (response.data.data.token) and user info
-            // localStorage.setItem('authToken', response.data.data.token);
-            // localStorage.setItem('userRole', response.data.data.user.role);
+            localStorage.setItem('authToken', response.data.data.token);
+            localStorage.setItem('userRole', response.data.data.user.role);
 
             // Redirect based on the selected role or the role returned by the backend
             switch (response.data.data.user.role) {
@@ -65,6 +93,71 @@ export default function SignupPage() {
         }
     }
 
+    const renderRoleSpecificFields = () => {
+        if (role === "transporter") {
+            return (
+                <>
+                    <div className="grid gap-2">
+                        <Label htmlFor="transporterName">Full Name</Label>
+                        <Input
+                            id="transporterName"
+                            placeholder="John Doe"
+                            required
+                            value={transporterName}
+                            onChange={(e) => setTransporterName(e.target.value)}
+                        />
+                    </div>
+                    <div className="grid gap-2">
+                        <Label htmlFor="idNumber">ID Number</Label>
+                        <Input
+                            id="idNumber"
+                            placeholder="12345678"
+                            required
+                            value={idNumber}
+                            onChange={(e) => setIdNumber(e.target.value)}
+                        />
+                    </div>
+                </>
+            )
+        } else if (role === "customer") {
+            return (
+                <>
+                    <div className="grid gap-2">
+                        <Label htmlFor="companyName">Company Name</Label>
+                        <Input
+                            id="companyName"
+                            placeholder="ABC Company Ltd"
+                            required
+                            value={companyName}
+                            onChange={(e) => setCompanyName(e.target.value)}
+                        />
+                    </div>
+                    <div className="grid gap-2">
+                        <Label htmlFor="location">Location</Label>
+                        <Input
+                            id="location"
+                            placeholder="Nairobi, Kenya"
+                            required
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
+                        />
+                    </div>
+                    <div className="grid gap-2">
+                        <Label htmlFor="pin">PIN</Label>
+                        <Input
+                            id="pin"
+                            placeholder="P123456789A"
+                            required
+                            value={pin}
+                            onChange={(e) => setPin(e.target.value)}
+                        />
+                    </div>
+                </>
+            )
+        }
+        return null
+    }
+
     return (
         <div className="flex items-center justify-center min-h-screen bg-muted py-12">
             <Card className="w-full max-w-md">
@@ -78,17 +171,29 @@ export default function SignupPage() {
                     </CardHeader>
                     <CardContent className="grid gap-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="fullname">Full Name</Label>
-                            <Input
-                                id="fullname"
-                                placeholder="John Doe"
-                                required
-                                value={fullname}
-                                onChange={(e) => setFullname(e.target.value)}
-                            />
+                            <Label>I am a...</Label>
+                            <RadioGroup
+                                defaultValue="customer"
+                                onValueChange={(value: UserRole) => setRole(value)}
+                                className="flex gap-3 pt-2"
+                            >
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="customer" id="customer" />
+                                    <Label htmlFor="customer">Customer</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="transporter" id="transporter" />
+                                    <Label htmlFor="transporter">Transporter</Label>
+                                </div>
+                            </RadioGroup>
                         </div>
+
+                        {/* Role-specific fields */}
+                        {renderRoleSpecificFields()}
+
+                        {/* Common fields */}
                         <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
+                            <Label htmlFor="email">Email Address</Label>
                             <Input
                                 id="email"
                                 type="email"
@@ -96,6 +201,17 @@ export default function SignupPage() {
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="phone">Phone Number</Label>
+                            <Input
+                                id="phone"
+                                type="tel"
+                                placeholder="+254 700 123 456"
+                                required
+                                value={phone}
+                                onChange={(e) => setphone(e.target.value)}
                             />
                         </div>
                         <div className="grid gap-2">
@@ -108,27 +224,7 @@ export default function SignupPage() {
                                 onChange={(e) => setPassword(e.target.value)}
                             />
                         </div>
-                        <div className="grid gap-2 ">
-                            <Label>I am a...</Label>
-                            <RadioGroup
-                                defaultValue="customer"
-                                onValueChange={(value: UserRole) => setRole(value)}
-                                className="flex gap-4 pt-2"
-                            >
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="customer" id="customer" />
-                                    <Label htmlFor="customer">Customer</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="transporter" id="transporter" />
-                                    <Label htmlFor="transporter">Transporter</Label>
-                                </div>
-                                {/*<div className="flex items-center space-x-2">*/}
-                                {/*    <RadioGroupItem value="admin" id="admin" />*/}
-                                {/*    <Label htmlFor="admin">Admin</Label>*/}
-                                {/*</div>*/}
-                            </RadioGroup>
-                        </div>
+
                         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
                         {success && <p className="text-green-500 text-sm text-center">{success}</p>}
                     </CardContent>

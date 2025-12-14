@@ -237,16 +237,18 @@ export function DashboardOverview() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-2xl font-bold text-gray-800">
-                    {getTimeBasedGreeting()},{" "}
-                    <span className="text-blue-600">
-                        {getFirstName(storedName)}
-                    </span>
-                    !
-                </h2>
-                <p className="text-gray-600">Here's your shipment overview</p>
-            </div>
+            <Card className="bg-gradient-to-r from-blue-900 to-blue-700">
+                <CardContent className="pt-6">
+                    <h2 className="text-2xl font-bold text-white">
+                        {getTimeBasedGreeting()},{" "}
+                        <span className="text-orange-400">
+                {getFirstName(storedName)}
+              </span>
+                        !
+                    </h2>
+                    <p className="text-blue-100 mt-1">Here's your shipment overview</p>
+                </CardContent>
+            </Card>
 
             {/* Top 4 Dashboard Cards */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

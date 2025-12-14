@@ -17,7 +17,7 @@ const fontSerif = Poppins({
 
 
 export const metadata: Metadata = {
-  title: 'teke.AI',
+  title: 'kasi',
   description: 'AI-Powered Deliveries, Simplified.',
 };
 

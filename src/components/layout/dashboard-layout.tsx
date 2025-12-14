@@ -73,7 +73,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                                 <span className="text-primary-foreground font-bold text-sm">T</span>
                             </div>
-                            <span className="font-heading font-semibold text-sidebar-foreground">teke.AI</span>
+                            <span className="font-heading font-semibold text-sidebar-foreground">kasi</span>
                         </div>
                         <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setSidebarOpen(false)}>
                             <X className="h-4 w-4" />

@@ -152,7 +152,7 @@ export function PublicOrderForm() {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm">T</span>
             </div>
-            <span className="font-heading font-semibold text-foreground text-xl">teke.AI</span>
+            <span className="font-heading font-semibold text-foreground text-xl">kasi</span>
           </div>
           <h1 className="text-3xl font-heading font-bold text-foreground mb-2">Submit Your Order</h1>
           <p className="text-muted-foreground">

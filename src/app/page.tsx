@@ -8,7 +8,7 @@ export default function HeroPage() {
             <header className="px-4 lg:px-6 h-14 flex items-center bg-background">
                 <Link href="#" className="flex items-center justify-center" prefetch={false}>
                     <Package2 className="h-6 w-6 text-primary" />
-                    <span className="ml-2 text-xl font-bold font-headline text-primary">teke.AI</span>
+                    <span className="ml-2 text-xl font-bold font-headline text-primary">kasi</span>
                 </Link>
                 <nav className="ml-auto flex gap-4 sm:gap-6">
                     <Button variant="ghost" asChild>
@@ -32,7 +32,7 @@ export default function HeroPage() {
                                     Get Your Goods Moving- <span className="text-primary">The Smarter Way</span>
                                 </h1>
                                 <p className="mx-auto max-w-[700px] text-foreground/80 md:text-xl">
-                                    Teke.AI instantly matches you to available trucks, vans, or motorbikes that suits your needs,while
+                                    Kasi instantly matches you to available trucks, vans, or motorbikes that suits your needs,while
                                     helping drivers find paying customers for their return trips.
                                 </p>
                             </div>
@@ -44,11 +44,11 @@ export default function HeroPage() {
                     <div className="container px-4 md:px-6">
                         <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
                             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">
-                                How <span className="text-primary">teke.AI</span> Helps You
+                                How <span className="text-primary">kasi</span> Helps You
                             </h2>
                             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
                                 Whether you're a business shipping goods, a retailer restocking inventory, or a driver with an empty
-                                truck—Teke.AI connects you with opportunity in real-time.
+                                truck—kasi connects you with opportunity in real-time.
                             </p>
                         </div>
 
@@ -119,7 +119,7 @@ export default function HeroPage() {
                             <div className="space-y-2">
                                 <div className="inline-block rounded-lg bg-secondary px-3 py-1 text-sm">Key Features</div>
                                 <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">
-                                    Why Choose <span className="text-primary">teke.AI</span>?
+                                    Why Choose <span className="text-primary">kasi</span>?
                                 </h2>
                                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                                     We provide a seamless and secure platform to connect you with professional transporters for all your
@@ -171,7 +171,7 @@ export default function HeroPage() {
                 </section>
             </main>
             <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-                <p className="text-xs text-muted-foreground">&copy; 2024 teke.AI. All rights reserved.</p>
+                <p className="text-xs text-muted-foreground">&copy; 2025 kasi. All rights reserved.</p>
                 <nav className="sm:ml-auto flex gap-4 sm:gap-6">
                     <Link href="/admin" className="text-xs hover:underline underline-offset-4" prefetch={false}>
                         Admin

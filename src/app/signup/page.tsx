@@ -67,24 +67,14 @@ export default function SignupPage() {
             const response = await authService.register(registrationData)
 
             setSuccess(response.data.message || "Registration successful!")
-            // In a real app, you'd save the token (response.data.data.token) and user info
+            // Save the token and user info
             localStorage.setItem('authToken', response.data.data.token);
             localStorage.setItem('userRole', response.data.data.user.role);
+            localStorage.setItem('userId', response.data.data.user.id);
 
-            // Redirect based on the selected role or the role returned by the backend
-            switch (response.data.data.user.role) {
-                case "customer":
-                    router.push("/dashboard")
-                    break
-                case "transporter":
-                    router.push("/transporter-dashboard")
-                    break
-                case "admin":
-                    router.push("/admin")
-                    break
-                default:
-                    router.push("/dashboard")
-            }
+            // Always redirect to verification page first
+            router.push("/verification")
+
         } catch (err: any) {
             setError(err.response?.data?.message || "Registration failed. Please try again.")
             console.error("Signup error:", err)
@@ -167,7 +157,7 @@ export default function SignupPage() {
                             <Package2 className="h-8 w-8 text-primary" />
                         </Link>
                         <CardTitle className="text-2xl font-headline">Create an Account</CardTitle>
-                        <CardDescription>Join teke.AI and start shipping or transporting today.</CardDescription>
+                        <CardDescription>Join kasi and start shipping or transporting today.</CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-4">
                         <div className="grid gap-2">

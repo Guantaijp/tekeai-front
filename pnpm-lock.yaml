@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@genkit-ai/ai':
+        specifier: ^1.26.0
+        version: 1.26.0(@google-cloud/firestore@7.11.6)(firebase-admin@13.6.0)(firebase@11.10.0)(genkit@1.26.0(@google-cloud/firestore@7.11.6)(firebase-admin@13.6.0)(firebase@11.10.0))
+      '@genkit-ai/core':
+        specifier: ^1.26.0
+        version: 1.26.0(@google-cloud/firestore@7.11.6)(firebase-admin@13.6.0)(firebase@11.10.0)(genkit@1.26.0(@google-cloud/firestore@7.11.6)(firebase-admin@13.6.0)(firebase@11.10.0))
       '@genkit-ai/firebase':
         specifier: ^1.15.5
         version: 1.26.0(@google-cloud/firestore@7.11.6)(firebase-admin@13.6.0)(firebase@11.10.0)(genkit@1.26.0(@google-cloud/firestore@7.11.6)(firebase-admin@13.6.0)(firebase@11.10.0))
@@ -104,12 +110,18 @@ importers:
       embla-carousel-react:
         specifier: ^8.6.0
         version: 8.6.0(react@19.2.3)
+      express:
+        specifier: ^4.22.1
+        version: 4.22.1
       firebase:
         specifier: ^11.9.1
         version: 11.10.0
       genkit:
         specifier: ^1.14.1
         version: 1.26.0(@google-cloud/firestore@7.11.6)(firebase-admin@13.6.0)(firebase@11.10.0)
+      import-in-the-middle:
+        specifier: ^1.15.0
+        version: 1.15.0
       lucide-react:
         specifier: ^0.475.0
         version: 0.475.0(react@19.2.3)
@@ -134,6 +146,9 @@ importers:
       recharts:
         specifier: ^2.15.1
         version: 2.15.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      require-in-the-middle:
+        specifier: ^7.5.2
+        version: 7.5.2
       tailwind-merge:
         specifier: ^3.0.1
         version: 3.4.0

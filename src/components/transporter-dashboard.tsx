@@ -1,7 +1,8 @@
-'use client';
+'use client'
+
 import { TransporterDashboardOverview } from '@/components/transporter-dashboard-overview';
 import { MyJobs } from '@/components/my-jobs';
-import {BrowseRequests, TransporterJobs} from '@/components/browse-requests';
+import { TransporterJobs} from '@/components/browse-requests';
 import { MyFleet } from './my-fleet';
 import { RoutePlanner } from './route-planner';
 

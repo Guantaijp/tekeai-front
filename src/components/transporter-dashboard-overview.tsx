@@ -187,16 +187,17 @@ export function TransporterDashboardOverview() {
     const [dashboardData, setDashboardData] = useState<TransformedDashboardData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [storedName, setStoredName] = useState<string | null>(null);
 
-    const [storedName, setStoredName] = useState<string | null>(null)
-    console.log("user name",storedName)
-    console.log(Object.keys(localStorage))
-
+    // ✅ Move all localStorage access inside useEffect
     useEffect(() => {
-        const role = localStorage.getItem("userRole")  // ✅ correct key
-        console.log("Value in localStorage:", role)
-        setStoredName(role)
-    }, [])
+        // Only runs on client side
+        console.log("localStorage keys:", Object.keys(localStorage));
+        const role = localStorage.getItem("userRole");
+        console.log("Value in localStorage:", role);
+        console.log("user name", role);
+        setStoredName(role);
+    }, []);
 
     useEffect(() => {
         const fetchDashboardData = async () => {

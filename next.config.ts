@@ -1,23 +1,33 @@
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  /* config options here */
   typescript: {
     ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'placehold.co',
-        port: '',
         pathname: '/**',
       },
     ],
   },
-};
+  serverExternalPackages: [
+    'express',
+    'import-in-the-middle',
+    'require-in-the-middle',
+    '@genkit-ai/core',
+    '@genkit-ai/ai',
+    '@genkit-ai/googleai',
+    '@genkit-ai/firebase',
+    '@opentelemetry/instrumentation',
+    '@opentelemetry/exporter-jaeger',
+  ],
+  // Set Turbopack root to silence workspace warning
+  turbopack: {
+    root: process.cwd(),
+  },
+}
 
-export default nextConfig;
+export default nextConfig

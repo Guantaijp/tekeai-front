@@ -265,7 +265,7 @@ export function TransporterDashboardOverview() {
               </span>
                         !
                     </h2>
-                    <p className="text-blue-100 mt-1">Here's your shipment overview</p>
+                    <p className="text-blue-100 mt-1">Here is your shipment overview, have a great day at work.</p>
                 </CardContent>
             </Card>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

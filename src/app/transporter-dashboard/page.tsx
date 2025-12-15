@@ -1,11 +1,10 @@
 import { TransporterDashboard } from '@/components/transporter-dashboard';
 
-export default function TransporterDashboardPage({
-  searchParams,
-}: {
-  searchParams: { view: string };
+export default async function TransporterDashboardPage({
+                                                         searchParams,
+                                                       }: {
+  searchParams: Promise<{ view?: string }>;
 }) {
-  return (
-    <TransporterDashboard activeView={searchParams.view} />
-  );
+  const { view } = await searchParams;
+  return <TransporterDashboard activeView={view} />;
 }

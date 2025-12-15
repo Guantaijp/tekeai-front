@@ -1,11 +1,10 @@
 import { AdminDashboard } from '@/components/admin-dashboard';
 
-export default function AdminDashboardPage({
-  searchParams,
-}: {
-  searchParams: { view: string };
+export default async function AdminDashboardPage({
+                                                   searchParams,
+                                                 }: {
+  searchParams: Promise<{ view?: string }>;
 }) {
-  return (
-    <AdminDashboard activeView={searchParams.view} />
-  );
+  const { view } = await searchParams;
+  return <AdminDashboard activeView={view} />;
 }

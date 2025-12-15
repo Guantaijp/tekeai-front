@@ -1,11 +1,11 @@
 import { Dashboard } from '@/components/dashboard';
 
-export default function DashboardPage({
-  searchParams,
-}: {
-  searchParams: { view: string };
+export default async function DashboardPage({
+                                              searchParams,
+                                            }: {
+  searchParams: Promise<{ view?: string }>;
 }) {
-  return (
-    <Dashboard activeView={searchParams.view} />
-  );
+  const { view } = await searchParams;
+
+  return <Dashboard activeView={view} />;
 }

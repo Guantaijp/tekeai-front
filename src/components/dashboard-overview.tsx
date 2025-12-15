@@ -246,7 +246,7 @@ export function DashboardOverview() {
               </span>
                         !
                     </h2>
-                    <p className="text-blue-100 mt-1">Here's your shipment overview</p>
+                    <p className="text-blue-100 mt-1">Here is your shipment overview, have a great day at work.</p>
                 </CardContent>
             </Card>
 

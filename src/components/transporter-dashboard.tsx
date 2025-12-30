@@ -2,10 +2,11 @@
 
 import { TransporterDashboardOverview } from '@/components/transporter-dashboard-overview';
 import { MyJobs } from '@/components/my-jobs';
-import { TransporterJobs} from '@/components/browse-requests';
+import { TransporterJobs } from '@/components/browse-requests';
 import { MyFleet } from './my-fleet';
 import { RoutePlanner } from './route-planner';
-
+import {PayoutsPage} from "@/app/payouts/page";
+import {ProfilePage} from "@/app/profile/page";
 
 export function TransporterDashboard({ activeView }: { activeView?: string }) {
   const renderContent = () => {
@@ -18,6 +19,10 @@ export function TransporterDashboard({ activeView }: { activeView?: string }) {
         return <RoutePlanner />;
       case 'my-fleet':
         return <MyFleet />;
+      case 'payouts':
+        return <PayoutsPage />;
+      case 'profile':
+        return <ProfilePage />;
       case 'dashboard':
       default:
         return <TransporterDashboardOverview />;

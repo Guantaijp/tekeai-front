@@ -5,7 +5,9 @@ import { DashboardOverview } from './dashboard-overview';
 import { QuotesManagement } from './quotes-management';
 import MyShipmentsPage from "@/components/my-shipments";
 import ShipmentsTable from "@/app/shipments/shipments-table";
-import {OrderManagementDashboard} from "@/components/order-management-dashboard";
+import { OrderManagementDashboard } from "@/components/order-management-dashboard";
+
+
 
 export function Dashboard({ activeView }: { activeView?: string }) {
   const renderContent = () => {

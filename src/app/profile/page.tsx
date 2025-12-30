@@ -24,7 +24,7 @@ import {
 import { Camera, Save, Bell, Shield, CreditCard } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-export function ProfilePage() {
+export default function ProfilePage() {
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
 

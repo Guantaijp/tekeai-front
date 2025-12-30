@@ -5,8 +5,9 @@ import { MyJobs } from '@/components/my-jobs';
 import { TransporterJobs } from '@/components/browse-requests';
 import { MyFleet } from './my-fleet';
 import { RoutePlanner } from './route-planner';
-import {PayoutsPage} from "@/app/payouts/page";
-import {ProfilePage} from "@/app/profile/page";
+import ProfilePage from "@/app/profile/page";
+import PayoutsPage from "@/app/payouts/page";
+
 
 export function TransporterDashboard({ activeView }: { activeView?: string }) {
   const renderContent = () => {

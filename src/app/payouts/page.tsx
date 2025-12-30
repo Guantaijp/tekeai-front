@@ -84,7 +84,7 @@ const payouts = [
     },
 ];
 
-export function PayoutsPage() {
+export default function PayoutsPage() {
     const [filterStatus, setFilterStatus] = useState<string>('all');
 
     const filteredPayouts = payouts.filter(payout =>

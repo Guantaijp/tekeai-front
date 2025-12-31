@@ -117,55 +117,11 @@ export default function PayoutsPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">Payouts</h1>
+                <h1 className="text-3xl font-bold tracking-tight">My Earnings</h1>
                 <p className="text-muted-foreground mt-2">
                     View and manage your payment history
                 </p>
             </div>
-
-            <div className="grid gap-4 md:grid-cols-3">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
-                        <Wallet className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{formatCurrency(totalEarnings)}</div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                            Completed payouts
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Pending</CardTitle>
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{formatCurrency(pendingAmount)}</div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                            Awaiting processing
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">This Month</CardTitle>
-                        <Download className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {formatCurrency(totalEarnings * 0.6)}
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                            December earnings
-                        </p>
-                    </CardContent>
-                </Card>
-            </div>
-
             <Card>
                 <CardHeader>
                     <div className="flex items-center justify-between">
@@ -197,11 +153,10 @@ export default function PayoutsPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Payout ID</TableHead>
+
                                 <TableHead>Date</TableHead>
                                 <TableHead>Customer</TableHead>
                                 <TableHead>Order ID</TableHead>
-                                <TableHead>Method</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead className="text-right">Amount</TableHead>
                             </TableRow>
@@ -209,11 +164,9 @@ export default function PayoutsPage() {
                         <TableBody>
                             {filteredPayouts.map((payout) => (
                                 <TableRow key={payout.id}>
-                                    <TableCell className="font-medium">{payout.id}</TableCell>
                                     <TableCell>{formatDate(payout.date)}</TableCell>
                                     <TableCell>{payout.customer}</TableCell>
                                     <TableCell>{payout.orderId}</TableCell>
-                                    <TableCell>{payout.method}</TableCell>
                                     <TableCell>
                                         <Badge
                                             variant={

@@ -109,7 +109,7 @@ export function TransporterSidebar() {
               >
                 <Link href="/transporter-dashboard?view=payouts" className="group">
                   <Wallet className={iconClassName('payouts')} />
-                  <span>Payouts</span>
+                  <span>My Earnings</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

@@ -35,7 +35,6 @@ export default function ProfilePage() {
         email: 'john.mutua@example.com',
         phone: '+254 712 345 678',
         company: 'Swift Transport Ltd',
-        bio: 'Experienced transporter with 5 years in logistics across Nairobi and surrounding counties.',
         licenseNumber: 'KBY-123X',
         vehicleType: 'truck',
     });
@@ -77,7 +76,7 @@ export default function ProfilePage() {
                 </p>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-3">
+            <div className="w-full">
                 <div className="lg:col-span-2 space-y-6">
                     {/* Personal Information */}
                     <Card>
@@ -163,66 +162,6 @@ export default function ProfilePage() {
                                         setUserData({ ...userData, company: e.target.value })
                                     }
                                 />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="bio">Bio</Label>
-                                <Textarea
-                                    id="bio"
-                                    value={userData.bio}
-                                    onChange={(e) =>
-                                        setUserData({ ...userData, bio: e.target.value })
-                                    }
-                                    rows={4}
-                                    placeholder="Tell us about your transport services..."
-                                />
-                            </div>
-
-                            <Button onClick={handleSaveProfile} disabled={isLoading}>
-                                <Save className="mr-2 h-4 w-4" />
-                                {isLoading ? 'Saving...' : 'Save Changes'}
-                            </Button>
-                        </CardContent>
-                    </Card>
-
-                    {/* Business Information */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Business Information</CardTitle>
-                            <CardDescription>
-                                Your transport business details
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="license">Driver's License Number</Label>
-                                <Input
-                                    id="license"
-                                    value={userData.licenseNumber}
-                                    onChange={(e) =>
-                                        setUserData({ ...userData, licenseNumber: e.target.value })
-                                    }
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="vehicleType">Primary Vehicle Type</Label>
-                                <Select
-                                    value={userData.vehicleType}
-                                    onValueChange={(value) =>
-                                        setUserData({ ...userData, vehicleType: value })
-                                    }
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="truck">Truck</SelectItem>
-                                        <SelectItem value="van">Van</SelectItem>
-                                        <SelectItem value="pickup">Pickup</SelectItem>
-                                        <SelectItem value="lorry">Lorry</SelectItem>
-                                    </SelectContent>
-                                </Select>
                             </div>
 
                             <Button onClick={handleSaveProfile} disabled={isLoading}>
@@ -326,63 +265,6 @@ export default function ProfilePage() {
                                 <Save className="mr-2 h-4 w-4" />
                                 {isLoading ? 'Saving...' : 'Save Preferences'}
                             </Button>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Sidebar */}
-                <div className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center gap-2">
-                                <Shield className="h-5 w-5" />
-                                <CardTitle>Security</CardTitle>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <Button variant="outline" className="w-full justify-start">
-                                Change Password
-                            </Button>
-                            <Button variant="outline" className="w-full justify-start">
-                                Two-Factor Authentication
-                            </Button>
-                            <Button variant="outline" className="w-full justify-start">
-                                Active Sessions
-                            </Button>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center gap-2">
-                                <CreditCard className="h-5 w-5" />
-                                <CardTitle>Payment Methods</CardTitle>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <Button variant="outline" className="w-full justify-start">
-                                Bank Accounts
-                            </Button>
-                            <Button variant="outline" className="w-full justify-start">
-                                M-Pesa Details
-                            </Button>
-                            <Button variant="outline" className="w-full justify-start">
-                                Payment History
-                            </Button>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="border-destructive">
-                        <CardHeader>
-                            <CardTitle className="text-destructive">Danger Zone</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <Button variant="destructive" className="w-full">
-                                Delete Account
-                            </Button>
-                            <p className="text-xs text-muted-foreground mt-2">
-                                Once deleted, your account cannot be recovered
-                            </p>
                         </CardContent>
                     </Card>
                 </div>
